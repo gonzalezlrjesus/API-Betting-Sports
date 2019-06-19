@@ -1,5 +1,6 @@
 package main
 
+// Test merge
 import (
 	"fmt"
 
