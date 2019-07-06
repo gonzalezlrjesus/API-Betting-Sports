@@ -7,15 +7,35 @@ can preview my
 
 markdown in a `text editor`! Cool!
 
-- [ ] item 1
-    - [ ] item 1-1
-    - [ ] item 1-2
-    - [ ] item 1-3
-    - [ ] item 1-4
-- [ ] item 2
-    - [x] item 2-3
-    - [ ] item 2-4
+- [ ] ci
+    - [ ] circleci
+    - [ ] travisci
+- [ ] command
+    - [ ] cra
+    - [ ] heap-snapshot
+    - [ ] lighthouse
+    - [ ] heap-snapshot
+    - [ ] size
+    - [ ] unused-source
+- [ ] config
+- [ ] event
+- [ ] module
+    - [ ] chrome
+    - [ ] heap-snapshot
+    - [ ] lighthouse
+    - [ ] serve
+    - [ ] size
+    - [ ] unused-source
+- [ ] output
+    - [ ] html
+    - [ ] json
+    - [ ] markdown
+- [ ] utils
+- [ ] vcs
+    - [ ] github
 ____
+
+
 
 ```javascript
 function writeAllTheWikis () {
