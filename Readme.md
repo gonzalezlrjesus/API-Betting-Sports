@@ -1,11 +1,11 @@
-# This a preview of Markdown!
+# Gimbal Documentation
 
-*This* **is** great because
-[I](htttp://github.com/gonzalezlrjesus)
-can preview my 
->Github
+This repo is split up into packages using Lerna to orchestrate and manage the monorepo.
 
-markdown in a `text editor`! Cool!
+The following are links to the projects and their doc site:
+
+
+ # - [Gimbal](https://github.com/ModusCreateOrg/gimbal/tree/master/packages/gimbal) [[docs]](https://github.com/ModusCreateOrg/gimbal/tree/master/packages/gimbal/docs)
 
 - [ ] ci
     - [ ] circleci
