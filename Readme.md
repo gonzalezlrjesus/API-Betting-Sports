@@ -5,7 +5,7 @@ This repo is split up into packages using Lerna to orchestrate and manage the mo
 The following are links to the projects and their doc site:
 
 
- # - [Gimbal](https://github.com/ModusCreateOrg/gimbal/tree/master/packages/gimbal) [[docs]](https://github.com/ModusCreateOrg/gimbal/tree/master/packages/gimbal/docs)
+ # * [Gimbal](https://github.com/ModusCreateOrg/gimbal/tree/master/packages/gimbal) [[docs]](https://github.com/ModusCreateOrg/gimbal/tree/master/packages/gimbal/docs)
 
 - [ ] ci
     - [ ] circleci
