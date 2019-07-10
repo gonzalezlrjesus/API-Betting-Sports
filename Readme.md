@@ -1,11 +1,10 @@
 # Gimbal Documentation
 
-This repo is split up into packages using Lerna to orchestrate and manage the monorepo.
+This repo is split up into packages using [Lerna](https://lerna.js.org/) to orchestrate and manage the [monorepo](https://en.wikipedia.org/wiki/Monorepo).
 
 The following are links to the projects and their doc site:
 
-
- - [Gimbal](https://github.com/ModusCreateOrg/gimbal/tree/master/packages/gimbal) [[docs]](https://github.com/ModusCreateOrg/gimbal/tree/master/packages/gimbal/docs)
+- [Gimbal](../packages/gimbal) [ [docs](../packages/gimbal/docs) ]
 
 ## 
 - [ ] ci
