@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
-	// Postgres library
+	// Gorm Postgres library
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
 )
@@ -25,7 +25,6 @@ func init() {
 	dbHost := os.Getenv("db_host")
 
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username, dbName, password)
-	fmt.Println(dbURI)
 
 	conn, err := gorm.Open("postgres", dbURI)
 	if err != nil {
@@ -35,7 +34,7 @@ func init() {
 	conn.Debug().AutoMigrate(&Admin{}, &Client{})
 }
 
-// GetDB sdsds
+// GetDB gorm
 func GetDB() *gorm.DB {
 	return db
 }

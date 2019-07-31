@@ -22,32 +22,6 @@ type Client struct {
 	Token              string `json:"token";sql:"-"`
 }
 
-// ValidateClient struct that Front-End to Back-End
-func (client *Client) ValidateClient() (map[string]interface{}, bool) {
-
-	if client.Name == "" {
-		return u.Message(false, "Name is required"), false
-	}
-	//Identificationcard must be unique
-	temp := &Client{}
-
-	if client.Identificationcard == "" {
-		return u.Message(false, "Identificationcard is required"), false
-	}
-
-	//check for errors and duplicate Identificationcard
-	err := GetDB().Table("clients").Where("Identificationcard = ?", client.Identificationcard).First(temp).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return u.Message(false, "Connection error. Please retry"), false
-	}
-
-	if temp.Identificationcard != "" {
-		return u.Message(false, "Identificationcard already in use by another user."), false
-	}
-
-	return u.Message(false, "Requirement passed"), true
-}
-
 // CreateClient Client db
 func (client *Client) CreateClient() map[string]interface{} {
 
@@ -90,7 +64,6 @@ func LoginClient(identificationcard string) map[string]interface{} {
 	tokenString, err := token.SignedString([]byte(os.Getenv("token_password")))
 	if err != nil {
 		fmt.Println("sas", err)
-		fmt.Println(err)
 	}
 	client.Token = tokenString //Store the token in the response
 
@@ -99,22 +72,22 @@ func LoginClient(identificationcard string) map[string]interface{} {
 	return resp
 }
 
-// GetClient from DB
+// GetClient client that request for him identification
 func GetClient(idClient *string) (*Client, string) {
 
-	acc := &Client{}
-	err := GetDB().Table("clients").Where("Identificationcard = ?", *idClient).First(acc).Error
+	client := &Client{}
+	err := GetDB().Table("clients").Where("Identificationcard = ?", *idClient).First(client).Error
 	if err != nil {
-		fmt.Println(err)
 		return nil, "Failed"
 	}
-	if acc.Identificationcard == "" { //User not found!
+
+	if client.Identificationcard == "" { //User not found!
 		return nil, "Failed"
 	}
-	return acc, "success"
+	return client, "success"
 }
 
-// GetClients all db
+// GetClients all client of table clients
 func GetClients() []*Client {
 
 	clients := make([]*Client, 0)
@@ -128,18 +101,16 @@ func GetClients() []*Client {
 	return clients
 }
 
-// UpdateClient from DB
+// UpdateClient client in DB
 func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 
 	if resp, ok := client.ValidateClientParams(idClient); !ok {
 		return resp
 	}
 
-	//Identificationcard must be unique
 	temp := &Client{Identificationcard: *idClient}
-	fmt.Println(temp.Identificationcard)
 
-	//check for errors and duplicate Identificationcard
+	//check client in DB
 	err := GetDB().Table("clients").Where("Identificationcard = ?", temp.Identificationcard).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println(err)
@@ -162,9 +133,53 @@ func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 
 }
 
-// ValidateClientParams struct that Front-End to Back-End
-func (client *Client) ValidateClientParams(idClient *string) (map[string]interface{}, bool) {
+// DeleteClient from DB
+func DeleteClient(idClient *string) bool {
+
 	temp := &Client{}
+	// Select records
+	err := GetDB().Table("clients").Where("Identificationcard= ?", *idClient).First(temp).Error
+
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return false
+	}
+
+	// Delete it
+	GetDB().Delete(temp)
+	return true
+}
+
+// ---------------------------Validations------------------------------
+
+// ValidateClient struct that Front-End to Back-End
+func (client *Client) ValidateClient() (map[string]interface{}, bool) {
+
+	if client.Name == "" {
+		return u.Message(false, "Name is required"), false
+	}
+	//Identificationcard must be unique
+	temp := &Client{}
+
+	if client.Identificationcard == "" {
+		return u.Message(false, "Identificationcard is required"), false
+	}
+
+	//check for errors and duplicate Identificationcard
+	err := GetDB().Table("clients").Where("Identificationcard = ?", client.Identificationcard).First(temp).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return u.Message(false, "Connection error. Please retry"), false
+	}
+
+	if temp.Identificationcard != "" {
+		return u.Message(false, "Identificationcard already in use by another user."), false
+	}
+
+	return u.Message(false, "Requirement passed"), true
+}
+
+// ValidateClientParams struct Params for Update Client
+func (client *Client) ValidateClientParams(idClient *string) (map[string]interface{}, bool) {
+	tempParam := &Client{}
 
 	if client.Identificationcard == "" {
 		return u.Message(false, "Identificationcard is required"), false
@@ -174,41 +189,26 @@ func (client *Client) ValidateClientParams(idClient *string) (map[string]interfa
 		return u.Message(false, "Name is required"), false
 	}
 
-	err := GetDB().Table("clients").Where("Identificationcard = ?", *idClient).First(temp).Error
+	// Data Param
+	err := GetDB().Table("clients").Where("Identificationcard = ?", *idClient).First(tempParam).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return u.Message(false, "Connection error. Please retry"), false
 	}
-	fmt.Println("validation")
-	fmt.Println(err)
+
 	if err == gorm.ErrRecordNotFound {
-		return u.Message(false, "Not found client"), false
+		return u.Message(false, "Not found client ID Param"), false
 	}
 
-	temp2 := &Client{}
-	err2 := GetDB().Table("clients").Where("Identificationcard = ?", client.Identificationcard).First(temp2).Error
-	if err2 != nil && err2 != gorm.ErrRecordNotFound {
+	// Data form
+	tempForm := &Client{}
+	errAux := GetDB().Table("clients").Where("Identificationcard = ?", client.Identificationcard).First(tempForm).Error
+	if errAux != nil && errAux != gorm.ErrRecordNotFound {
 		return u.Message(false, "Connection error. Please retry"), false
 	}
 
-	if err2 != gorm.ErrRecordNotFound && temp2.Identificationcard != *idClient {
-		return u.Message(false, "there is a client with this identification"), false
+	if errAux != gorm.ErrRecordNotFound && tempForm.Identificationcard != *idClient {
+		return u.Message(false, "there is client with this identification to send in Form"), false
 	}
 
-	fmt.Println(temp.Identificationcard)
 	return u.Message(false, "Requirement passed"), true
-}
-
-// DeleteClient from DB
-func DeleteClient(idClient *string) bool {
-
-	temp := &Client{}
-	// Select records and delete it
-	err := GetDB().Table("clients").Where("Identificationcard= ?", *idClient).First(temp).Error
-
-	if err != nil || err == gorm.ErrRecordNotFound {
-		return false
-	}
-	GetDB().Delete(temp)
-	return true
-
 }

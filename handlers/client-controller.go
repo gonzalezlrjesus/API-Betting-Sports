@@ -10,45 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// CreateAdmin user
-var CreateAdmin = func(w http.ResponseWriter, r *http.Request) {
-
-	admin := &models.Admin{}
-	err := json.NewDecoder(r.Body).Decode(admin) //decode the request body into struct and failed if any error occur
-	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request"))
-		return
-	}
-
-	resp := admin.Create() //Create admin
-	u.Respond(w, resp)
-}
-
-// Authenticate var export
-var Authenticate = func(w http.ResponseWriter, r *http.Request) {
-
-	admin := &models.Admin{}
-
-	err := json.NewDecoder(r.Body).Decode(admin) //decode the request body into struct and failed if any error occur
-	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request"))
-		return
-	}
-
-	resp := models.Login(admin.Email, admin.Password)
-	u.Respond(w, resp)
-}
-
-// GetAdminFor sss
-var GetAdminFor = func(w http.ResponseWriter, r *http.Request) {
-
-	data := models.GetAdmins()
-	resp := u.Message(true, "success")
-	resp["data"] = data
-	u.Respond(w, resp)
-}
-
-// CreateClient user
+// CreateClient client
 var CreateClient = func(w http.ResponseWriter, r *http.Request) {
 
 	client := &models.Client{}
@@ -77,7 +39,7 @@ var AuthenticateClient = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp)
 }
 
-// GetClientsFor sss
+// GetClientsFor list clients
 var GetClientsFor = func(w http.ResponseWriter, r *http.Request) {
 
 	data := models.GetClients()
@@ -86,7 +48,7 @@ var GetClientsFor = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp)
 }
 
-// GetSpecificClient find client
+// GetSpecificClient find and show client
 var GetSpecificClient = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idClient := vars["idClient"]

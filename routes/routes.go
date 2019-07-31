@@ -40,6 +40,8 @@ func Routes() *mux.Router {
 	// Login Client
 	router.HandleFunc("/api/clients/login", handlers.AuthenticateClient).Methods("POST")
 
+	// ------------------Middleware Auth Token JWT----------------------------
 	router.Use(w.JwtAuthentication) //attach JWT auth middleware
+
 	return router
 }
