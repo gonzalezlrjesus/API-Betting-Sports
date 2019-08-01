@@ -42,6 +42,7 @@ func (client *Client) CreateClient() map[string]interface{} {
 	client.Token = tokenString
 
 	response := u.Message(true, "client has been created")
+	response["Amount"] = CreateAmount(client.Identificationcard)
 	response["client"] = client
 	return response
 }
@@ -129,6 +130,32 @@ func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 
 	response := u.Message(true, "client has been updated")
 	response["client"] = client
+	return response
+
+}
+
+// UpdateStateClient client in DB
+func UpdateStateClient(idClient *string, setStateClient *Client) map[string]interface{} {
+
+	temp := &Client{Identificationcard: *idClient}
+
+	//check client in DB
+	err := GetDB().Table("clients").Where("Identificationcard = ?", temp.Identificationcard).First(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println(err)
+		return nil
+	}
+
+	if setStateClient.State == "habilitado" {
+		temp.State = "bloqueado"
+	} else {
+		temp.State = "habilitado"
+	}
+
+	GetDB().Save(&temp)
+
+	response := u.Message(true, "client has updated your state")
+	response["client"] = temp
 	return response
 
 }

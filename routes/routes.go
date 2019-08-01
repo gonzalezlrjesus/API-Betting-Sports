@@ -29,8 +29,20 @@ func Routes() *mux.Router {
 	// Update Client
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.UpdateClient).Methods("PUT")
 
+	// Update State Blocked or Enable to access Client
+	router.HandleFunc("/api/admin/clients/{idClient}/state", handlers.StateClient).Methods("PUT")
+
 	// Delete Cliente
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.DeleteClient).Methods("DELETE")
+
+	// Add a deposit to money in client account
+	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.AddDeposit).Methods("POST")
+
+	// To view all Deposit Client
+	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.HistorialDeposits).Methods("GET")
+
+	// To view Coin Client
+	router.HandleFunc("/api/admin/clients/{idClient}/coin", handlers.CoinClient).Methods("GET")
 
 	// Login Admin
 	router.HandleFunc("/api/admin/login", handlers.Authenticate).Methods("POST")

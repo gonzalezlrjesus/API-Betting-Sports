@@ -15,6 +15,7 @@ var CreateClient = func(w http.ResponseWriter, r *http.Request) {
 
 	client := &models.Client{}
 	err := json.NewDecoder(r.Body).Decode(client) //decode the request body into struct and failed if any error occur
+
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"))
 		return
@@ -72,6 +73,24 @@ var UpdateClient = func(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := client.UpdateClient(&idClient)
+	resp := u.Message(true, "Success")
+	resp["data"] = data
+	u.Respond(w, resp)
+}
+
+// StateClient find client
+var StateClient = func(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idClient := vars["idClient"]
+	setStateClient := &models.Client{}
+
+	err := json.NewDecoder(r.Body).Decode(setStateClient) //decode the request body into struct and failed if any error occur
+	if err != nil {
+		u.Respond(w, u.Message(false, "Invalid request"))
+		return
+	}
+
+	data := models.UpdateStateClient(&idClient, setStateClient)
 	resp := u.Message(true, "Success")
 	resp["data"] = data
 	u.Respond(w, resp)
