@@ -1,0 +1,156 @@
+package models
+
+import (
+	"fmt"
+	u "test-golang/utils"
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
+
+// Event struct
+type Event struct {
+	gorm.Model
+	DateEvent time.Time `json:"date"`
+}
+
+// CreateEvent Event db
+func (event *Event) CreateEvent() map[string]interface{} {
+
+	if resp, ok := event.ValidateEvent(); !ok {
+		return resp
+	}
+
+	GetDB().Create(event)
+
+	response := u.Message(true, "event add to System")
+	response["event"] = event
+	return response
+}
+
+// UpdateEvent in DB
+func (event *Event) UpdateEvent(idEvent *string) map[string]interface{} {
+
+	if resp, ok := event.ValidateEventParams(idEvent); !ok {
+		return resp
+	}
+
+	temp := &Event{}
+
+	err := GetDB().Table("eve").Where("id = ?", *idEvent).First(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println(err)
+		return nil
+	}
+
+	temp.DateEvent = event.DateEvent
+
+	GetDB().Save(&temp)
+
+	response := u.Message(true, "Event has been updated")
+	response["event"] = temp
+	return response
+
+}
+
+// GetOneEvent event
+func GetOneEvent(idEvent *string) map[string]interface{} {
+	temp := &Event{}
+
+	//check event specific in DB
+	err := GetDB().Table("events").Where("id = ?", *idEvent).First(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println("idEvent : ", err)
+		return u.Message(true, "idEvent no exist")
+	}
+
+	response := u.Message(true, "Get Event")
+	response["event"] = temp
+	return response
+}
+
+// GetEvents all events of table events
+func GetEvents() []*Event {
+
+	events := make([]*Event, 0)
+
+	err := GetDB().Table("events").Find(&events).Error
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return events
+}
+
+// DeleteEvent from DB
+func DeleteEvent(idEvent *string) bool {
+
+	temp := &Event{}
+	// Select Event
+	err := GetDB().Table("events").Where("id= ?", *idEvent).First(temp).Error
+
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return false
+	}
+
+	// Delete it
+	GetDB().Delete(temp)
+	return true
+}
+
+// ---------------------------Validations------------------------------
+
+// ValidateEvent struct that Front-End to Back-End
+func (event *Event) ValidateEvent() (map[string]interface{}, bool) {
+
+	if event.DateEvent.IsZero() {
+		return u.Message(false, "Date Event is empty"), false
+	}
+
+	// Data form
+	tempForm := &Event{}
+	errAux := GetDB().Table("events").Where("date_event = ?", event.DateEvent).First(tempForm).Error
+	if errAux != nil && errAux != gorm.ErrRecordNotFound {
+		return u.Message(false, "Connection error. Please retry"), false
+	}
+	if !tempForm.DateEvent.IsZero() {
+		return u.Message(false, "there is event with this DateEvent"), false
+	}
+
+	return u.Message(false, "Requirement passed"), true
+}
+
+// ValidateEventParams struct Params for Update Event
+func (event *Event) ValidateEventParams(idEvent *string) (map[string]interface{}, bool) {
+
+	if event.DateEvent.IsZero() {
+		return u.Message(false, "Date Event is empty"), false
+	}
+
+	tempIDevent := &Event{}
+
+	// Search idEvent in DB
+	erridEvent := GetDB().Table("events").Where("id = ?", *idEvent).First(tempIDevent).Error
+	if erridEvent == gorm.ErrRecordNotFound {
+		fmt.Println(erridEvent)
+		return u.Message(false, "Not found ID Event Param"), false
+	}
+
+	if erridEvent == gorm.ErrRecordNotFound {
+		return u.Message(false, "Not found ID Event Param"), false
+	}
+
+	// Data form
+	tempForm := &Event{}
+	errAux := GetDB().Table("events").Where("date_event = ?", event.DateEvent).First(tempForm).Error
+	if errAux != nil && errAux != gorm.ErrRecordNotFound {
+		return u.Message(false, "Connection error. Please retry"), false
+	}
+
+	if errAux != gorm.ErrRecordNotFound && tempForm.DateEvent != tempIDevent.DateEvent {
+		return u.Message(false, "there is event with this DateEvent"), false
+	}
+
+	return u.Message(false, "Requirement passed"), true
+}

@@ -17,23 +17,43 @@ func Routes() *mux.Router {
 	router.HandleFunc("/api/admin", handlers.CreateAdmin).Methods("POST")
 	// Create new Client
 	router.HandleFunc("/api/admin/clients", handlers.CreateClient).Methods("POST")
+	// Create new Event
+	router.HandleFunc("/api/admin/event", handlers.CreateEvent).Methods("POST")
+	// Create new Racing
+	router.HandleFunc("/api/admin/event/{idEvent}/racing", handlers.CreateRacing).Methods("POST")
 
 	// To view all admin
 	router.HandleFunc("/api/admin", handlers.GetAdminFor).Methods("GET")
 	// To View all clients
 	router.HandleFunc("/api/admin/clients", handlers.GetClientsFor).Methods("GET")
+	// To View all Events
+	router.HandleFunc("/api/admin/event", handlers.GetEventsFor).Methods("GET")
+	// To View all Racings
+	router.HandleFunc("/api/admin/event/{idEvent}/racing", handlers.GetRacingsFor).Methods("GET")
 
 	// To a specific client
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.GetSpecificClient).Methods("GET")
+	// To a specific event
+	router.HandleFunc("/api/admin/event/{idEvent}", handlers.GetSpecificEvent).Methods("GET")
+	// To a specific Racing
+	router.HandleFunc("/api/admin/event/{idEvent}/racing/{idRacing}", handlers.GetSpecificRacing).Methods("GET")
 
 	// Update Client
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.UpdateClient).Methods("PUT")
+	// Update Event
+	router.HandleFunc("/api/admin/event/{idEvent}", handlers.UpdateEvent).Methods("PUT")
+	// Update Racing
+	router.HandleFunc("/api/admin/event/{idEvent}/racing/{idRacing}", handlers.UpdateRacing).Methods("PUT")
 
 	// Update State Blocked or Enable to access Client
 	router.HandleFunc("/api/admin/clients/{idClient}/state", handlers.StateClient).Methods("PUT")
 
 	// Delete Cliente
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.DeleteClient).Methods("DELETE")
+	// Delete Event
+	router.HandleFunc("/api/admin/event/{idEvent}", handlers.DeleteEvent).Methods("DELETE")
+	// Delete Racing
+	router.HandleFunc("/api/admin/event/{idEvent}/racing/{idRacing}", handlers.DeleteRacing).Methods("DELETE")
 
 	// Add a deposit to money in client account
 	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.AddDeposit).Methods("POST")
