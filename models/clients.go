@@ -119,16 +119,19 @@ func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 	}
 
 	temp.Email = client.Email
-	temp.Identificationcard = client.Identificationcard
 	temp.Name = client.Name
 	temp.Phone = client.Phone
 	temp.Banknumber = client.Banknumber
 	temp.Bankname = client.Bankname
 	temp.State = client.State
 
-	GetDB().Save(&temp)
-
 	response := u.Message(true, "client has been updated")
+	if temp.Identificationcard != client.Identificationcard {
+		response["Coins"] = UpdateIdentificationCoinClient(temp.Identificationcard, client.Identificationcard)
+		response["Deposit"] = UpdateIdentificationClientDeposit(temp.Identificationcard, client.Identificationcard)
+		temp.Identificationcard = client.Identificationcard
+	}
+	GetDB().Save(&temp)
 	response["client"] = client
 	return response
 
@@ -160,7 +163,7 @@ func UpdateStateClient(idClient *string, setStateClient *Client) map[string]inte
 
 }
 
-// DeleteClient from DB
+// DeleteClient from DB  Delete client then delete All client deposits and client coin.
 func DeleteClient(idClient *string) bool {
 
 	temp := &Client{}
@@ -170,9 +173,15 @@ func DeleteClient(idClient *string) bool {
 	if err != nil || err == gorm.ErrRecordNotFound {
 		return false
 	}
+	// Delete all client deposit
+	DeleteDepositsClient(temp.Identificationcard)
+
+	// Delete all client coins
+	DeleteCoinsClient(temp.Identificationcard)
 
 	// Delete it
 	GetDB().Delete(temp)
+
 	return true
 }
 

@@ -42,6 +42,27 @@ func (coins *Coins) UpdateCoins(amountDeposit float64) map[string]interface{} {
 
 }
 
+// UpdateIdentificationCoinClient client identification in coins table of DB
+func UpdateIdentificationCoinClient(Clientidentificationcard, newIdentification string) map[string]interface{} {
+
+	temp := &Coins{}
+
+	//check Client identificaciont in DB
+	err := GetDB().Table("coins").Where("ClientIdentificationcard = ?", Clientidentificationcard).First(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println("client has not found : ", err)
+		return u.Message(true, "client has NOT updated your coins")
+	}
+
+	temp.Clientidentificationcard = newIdentification
+	GetDB().Save(&temp)
+
+	response := u.Message(true, "client has updated your identification")
+	response["coins"] = temp
+	return response
+
+}
+
 // GetCoinsClient client
 func GetCoinsClient(idClient *string) map[string]interface{} {
 	temp := &Coins{}
@@ -56,6 +77,21 @@ func GetCoinsClient(idClient *string) map[string]interface{} {
 	response := u.Message(true, "Get Coins")
 	response["coins"] = temp
 	return response
+}
+
+// DeleteCoinsClient client deposit in database
+func DeleteCoinsClient(Clientidentificationcard string) bool {
+
+	temp := &[]Deposit{}
+
+	//check Client coins in DB
+	err := GetDB().Table("coins").Where("ClientIdentificationcard LIKE ?", Clientidentificationcard).Delete(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println("Client coins ALL : ", err)
+		return false
+	}
+
+	return true
 }
 
 // ---------------------------Validations------------------------------
