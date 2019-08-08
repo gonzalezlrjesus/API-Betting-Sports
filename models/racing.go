@@ -23,18 +23,9 @@ func (racing *Racing) CreateRacing() map[string]interface{} {
 	}
 
 	GetDB().Create(racing)
-	// this are comment because here i must write create Component racing
-	// temp := &Racing{Eventid: deposit.Clientidentificationcard}
-
-	// //check client_Coins in DB
-	// err := GetDB().Table("coins").Where("ClientIdentificationcard = ?", temp.Clientidentificationcard).First(temp).Error
-	// if err == gorm.ErrRecordNotFound {
-	// 	fmt.Println("Client Coins : ", err)
-	// 	return nil
-	// }
 
 	response := u.Message(true, "Racing has been created")
-	// response["updateCoins"] = temp.UpdateCoins(deposit.Amount)
+	response["Components"] = CreateRacingComponents(racing.Model.ID)
 	response["racing"] = racing
 	return response
 }
@@ -69,7 +60,7 @@ func GetOneRacing(idEvent, idRacing *string) map[string]interface{} {
 	temp := &Racing{}
 
 	//check racing specific in DB
-	err := GetDB().Table("racings").Where("id= ? AND eventid >= ?", *idRacing, *idEvent).First(temp).Error
+	err := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, *idEvent).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("Racing : ", err)
 		return u.Message(true, "Racing no exist")
@@ -107,7 +98,7 @@ func DeleteRacing(idEvent, idRacing *string) bool {
 
 	tempRacing := &Racing{}
 	// Search Racing
-	errRacing := GetDB().Table("racings").Where("id= ? AND eventid >= ?", *idRacing, idEvent).First(tempRacing).Error
+	errRacing := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, idEvent).First(tempRacing).Error
 
 	if errRacing != nil || errRacing == gorm.ErrRecordNotFound {
 		return false
@@ -115,6 +106,36 @@ func DeleteRacing(idEvent, idRacing *string) bool {
 
 	// Delete it
 	GetDB().Delete(tempRacing)
+	DeleteRacingComponents(tempRacing.ID)
+	DeleteAllHorses(tempRacing.ID)
+	return true
+}
+
+// DeleteRacings delete all racings
+func DeleteRacings(idComponent *string) bool {
+
+	racings := &[]Racing{}
+
+	errRacings := GetDB().Table("racings").Where("eventid = ?", *idComponent).Find(&racings).Error
+	if errRacings != nil {
+		fmt.Println(errRacings)
+		return false
+	}
+
+	tempDelete := &[]Racing{}
+
+	// delete all racings
+	err := GetDB().Table("racings").Where("eventid LIKE ?", *idComponent).Delete(tempDelete).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println("Racingcomponentid  : ", err)
+		return false
+	}
+
+	for _, JustRace := range *racings {
+		DeleteRacingComponents(JustRace.ID)
+		DeleteAllHorses(JustRace.ID)
+	}
+
 	return true
 }
 

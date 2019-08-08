@@ -10,8 +10,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// ParamsID struct params
-type ParamsID struct {
+// paramsID struct params
+type paramsID struct {
 	idEvent  string
 	idRacing string
 }
@@ -35,7 +35,7 @@ var CreateRacing = func(w http.ResponseWriter, r *http.Request) {
 
 // UpdateRacing Racing
 var UpdateRacing = func(w http.ResponseWriter, r *http.Request) {
-	params := &ParamsID{}
+	params := &paramsID{}
 	vars := mux.Vars(r)
 	params.idEvent = vars["idEvent"]
 	params.idRacing = vars["idRacing"]
@@ -56,7 +56,7 @@ var UpdateRacing = func(w http.ResponseWriter, r *http.Request) {
 
 // DeleteRacing Racing
 var DeleteRacing = func(w http.ResponseWriter, r *http.Request) {
-	params := &ParamsID{}
+	params := &paramsID{}
 	vars := mux.Vars(r)
 	params.idEvent = vars["idEvent"]
 	params.idRacing = vars["idRacing"]
@@ -79,7 +79,7 @@ var GetRacingsFor = func(w http.ResponseWriter, r *http.Request) {
 
 // GetSpecificRacing find and show Racing
 var GetSpecificRacing = func(w http.ResponseWriter, r *http.Request) {
-	params := &ParamsID{}
+	params := &paramsID{}
 	vars := mux.Vars(r)
 	params.idEvent = vars["idEvent"]
 	params.idRacing = vars["idRacing"]

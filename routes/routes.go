@@ -21,32 +21,47 @@ func Routes() *mux.Router {
 	router.HandleFunc("/api/admin/event", handlers.CreateEvent).Methods("POST")
 	// Create new Racing
 	router.HandleFunc("/api/admin/event/{idEvent}/racing", handlers.CreateRacing).Methods("POST")
+	// Create new a Horse
+	router.HandleFunc("/api/admin/racing/{idRacing}/horse", handlers.CreateHorse).Methods("POST")
 
 	// To view all admin
 	router.HandleFunc("/api/admin", handlers.GetAdminFor).Methods("GET")
 	// To View all clients
 	router.HandleFunc("/api/admin/clients", handlers.GetClientsFor).Methods("GET")
+	// To view all Deposit Client
+	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.HistorialDeposits).Methods("GET")
 	// To View all Events
 	router.HandleFunc("/api/admin/event", handlers.GetEventsFor).Methods("GET")
 	// To View all Racings
 	router.HandleFunc("/api/admin/event/{idEvent}/racing", handlers.GetRacingsFor).Methods("GET")
+	// To View all Auction Number of specify Racing Component
+	router.HandleFunc("/api/admin/components/{idComponent}/auctionnumber", handlers.GetAuctionNumbers).Methods("GET")
+	// To View all Horses
+	router.HandleFunc("/api/admin/racing/{idRacing}/horse", handlers.GetHorses).Methods("GET")
 
 	// To a specific client
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.GetSpecificClient).Methods("GET")
+	// To a specific Coin Client
+	router.HandleFunc("/api/admin/clients/{idClient}/coin", handlers.CoinClient).Methods("GET")
 	// To a specific event
 	router.HandleFunc("/api/admin/event/{idEvent}", handlers.GetSpecificEvent).Methods("GET")
 	// To a specific Racing
 	router.HandleFunc("/api/admin/event/{idEvent}/racing/{idRacing}", handlers.GetSpecificRacing).Methods("GET")
+	// To a specific Racing Components
+	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.GetRacingComponents).Methods("GET")
 
 	// Update Client
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.UpdateClient).Methods("PUT")
+	// Update State Blocked or Enable to access Client
+	router.HandleFunc("/api/admin/clients/{idClient}/state", handlers.StateClient).Methods("PUT")
 	// Update Event
 	router.HandleFunc("/api/admin/event/{idEvent}", handlers.UpdateEvent).Methods("PUT")
 	// Update Racing
 	router.HandleFunc("/api/admin/event/{idEvent}/racing/{idRacing}", handlers.UpdateRacing).Methods("PUT")
-
-	// Update State Blocked or Enable to access Client
-	router.HandleFunc("/api/admin/clients/{idClient}/state", handlers.StateClient).Methods("PUT")
+	// Update RacingComponents
+	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.UpdateRacingComponents).Methods("PUT")
+	// Update Horse
+	router.HandleFunc("/api/admin/racing/{idRacing}/horse/{idHorse}", handlers.UpdateHorse).Methods("PUT")
 
 	// Delete Cliente
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.DeleteClient).Methods("DELETE")
@@ -54,15 +69,15 @@ func Routes() *mux.Router {
 	router.HandleFunc("/api/admin/event/{idEvent}", handlers.DeleteEvent).Methods("DELETE")
 	// Delete Racing
 	router.HandleFunc("/api/admin/event/{idEvent}/racing/{idRacing}", handlers.DeleteRacing).Methods("DELETE")
+	// Delete a auction number
+	router.HandleFunc("/api/admin/event/components/{idComponent}/auctionnumber/{idauctionnumber}", handlers.DeleteAuctionNumber).Methods("DELETE")
+	// Delete a Horse
+	router.HandleFunc("/api/admin/racing/{idRacing}/horse/{idHorse}", handlers.DeleteHorse).Methods("DELETE")
 
 	// Add a deposit to money in client account
 	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.AddDeposit).Methods("POST")
-
-	// To view all Deposit Client
-	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.HistorialDeposits).Methods("GET")
-
-	// To view Coin Client
-	router.HandleFunc("/api/admin/clients/{idClient}/coin", handlers.CoinClient).Methods("GET")
+	// Add a auction number
+	router.HandleFunc("/api/admin/components/{idComponent}/auctionnumber", handlers.AddAuctionNumber).Methods("POST")
 
 	// Login Admin
 	router.HandleFunc("/api/admin/login", handlers.Authenticate).Methods("POST")

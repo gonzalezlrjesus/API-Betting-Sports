@@ -11,7 +11,7 @@ import (
 // Event struct
 type Event struct {
 	gorm.Model
-	DateEvent time.Time `json:"date"`
+	Dateevent time.Time `json:"dateevent"`
 }
 
 // CreateEvent Event db
@@ -43,7 +43,7 @@ func (event *Event) UpdateEvent(idEvent *string) map[string]interface{} {
 		return nil
 	}
 
-	temp.DateEvent = event.DateEvent
+	temp.Dateevent = event.Dateevent
 
 	GetDB().Save(&temp)
 
@@ -96,6 +96,7 @@ func DeleteEvent(idEvent *string) bool {
 
 	// Delete it
 	GetDB().Delete(temp)
+	DeleteRacings(idEvent)
 	return true
 }
 
@@ -104,18 +105,18 @@ func DeleteEvent(idEvent *string) bool {
 // ValidateEvent struct that Front-End to Back-End
 func (event *Event) ValidateEvent() (map[string]interface{}, bool) {
 
-	if event.DateEvent.IsZero() {
+	if event.Dateevent.IsZero() {
 		return u.Message(false, "Date Event is empty"), false
 	}
 
 	// Data form
 	tempForm := &Event{}
-	errAux := GetDB().Table("events").Where("date_event = ?", event.DateEvent).First(tempForm).Error
+	errAux := GetDB().Table("events").Where("dateevent = ?", event.Dateevent).First(tempForm).Error
 	if errAux != nil && errAux != gorm.ErrRecordNotFound {
 		return u.Message(false, "Connection error. Please retry"), false
 	}
-	if !tempForm.DateEvent.IsZero() {
-		return u.Message(false, "there is event with this DateEvent"), false
+	if !tempForm.Dateevent.IsZero() {
+		return u.Message(false, "there is event with this Dateevent"), false
 	}
 
 	return u.Message(false, "Requirement passed"), true
@@ -124,7 +125,7 @@ func (event *Event) ValidateEvent() (map[string]interface{}, bool) {
 // ValidateEventParams struct Params for Update Event
 func (event *Event) ValidateEventParams(idEvent *string) (map[string]interface{}, bool) {
 
-	if event.DateEvent.IsZero() {
+	if event.Dateevent.IsZero() {
 		return u.Message(false, "Date Event is empty"), false
 	}
 
@@ -143,12 +144,12 @@ func (event *Event) ValidateEventParams(idEvent *string) (map[string]interface{}
 
 	// Data form
 	tempForm := &Event{}
-	errAux := GetDB().Table("events").Where("date_event = ?", event.DateEvent).First(tempForm).Error
+	errAux := GetDB().Table("events").Where("dateevent = ?", event.Dateevent).First(tempForm).Error
 	if errAux != nil && errAux != gorm.ErrRecordNotFound {
 		return u.Message(false, "Connection error. Please retry"), false
 	}
 
-	if errAux != gorm.ErrRecordNotFound && tempForm.DateEvent != tempIDevent.DateEvent {
+	if errAux != gorm.ErrRecordNotFound && tempForm.Dateevent != tempIDevent.Dateevent {
 		return u.Message(false, "there is event with this DateEvent"), false
 	}
 

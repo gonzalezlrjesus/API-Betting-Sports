@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"test-golang/models"
@@ -15,7 +16,7 @@ var CreateEvent = func(w http.ResponseWriter, r *http.Request) {
 
 	event := &models.Event{}
 	err := json.NewDecoder(r.Body).Decode(event) //decode the request body into struct and failed if any error occur
-
+	fmt.Println("err:", err)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"))
 		return

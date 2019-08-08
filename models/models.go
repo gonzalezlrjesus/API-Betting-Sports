@@ -31,7 +31,7 @@ func init() {
 		fmt.Print(err)
 	}
 	db = conn
-	conn.Debug().AutoMigrate(&Admin{}, &Client{}, &Coins{}, &Deposit{}, &Event{}, &Racing{})
+	conn.Debug().AutoMigrate(&Admin{}, &Client{}, &Coins{}, &Deposit{}, &Event{}, &Racing{}, &RacingComponents{}, &AuctionNumber{}, &Horse{})
 }
 
 // GetDB gorm
