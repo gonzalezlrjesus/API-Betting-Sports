@@ -1,6 +1,6 @@
-# Bettings Sport API
+# Sports Betting API
 
-This repo is a API for be used in a project of betting sports.
+This repo is a API for be used in a sports betting project.
 
 ## Folders
 
