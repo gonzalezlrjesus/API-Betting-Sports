@@ -1,4 +1,4 @@
-# API of Betting Sports
+# Bettings Sport API
 
 This repo is a API for be used in a project of betting sports.
 
