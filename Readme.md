@@ -1,35 +1,11 @@
-# Gimbal Documentation
+# API of Betting Sports
 
-This repo is split up into packages using [Lerna](https://lerna.js.org/) to orchestrate and manage the [monorepo](https://en.wikipedia.org/wiki/Monorepo).
+This repo is a API for be used in a project of betting sports.
 
-The following are links to the projects and their doc site:
+## Folders
 
-- [Gimbal](../packages/gimbal) [ [docs](../packages/gimbal/docs) ]
-
-## 
-- [ ] ci
-    - [ ] circleci
-    - [ ] travisci
-- [ ] command
-    - [ ] cra
-    - [ ] heap-snapshot
-    - [ ] lighthouse
-    - [ ] heap-snapshot
-    - [ ] size
-    - [ ] unused-source
-- [ ] config
-- [ ] event
-- [ ] module
-    - [ ] chrome
-    - [ ] heap-snapshot
-    - [ ] lighthouse
-    - [ ] serve
-    - [ ] size
-    - [ ] unused-source
-- [ ] output
-    - [ ] html
-    - [ ] json
-    - [ ] markdown
+- [ ] auth-JWT
+- [ ] handlers-controllers
+- [ ] models
+- [ ] routes
 - [ ] utils
-- [ ] vcs
-    - [ ] github
