@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"test-golang/models"
-	u "test-golang/utils"
+	"API-Betting-Sports/models"
+	u "API-Betting-Sports/utils"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )

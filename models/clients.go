@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 	"os"
-	u "test-golang/utils"
+	u "API-Betting-Sports/utils"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"

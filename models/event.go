@@ -1,8 +1,8 @@
 package models
 
 import (
+	u "API-Betting-Sports/utils"
 	"fmt"
-	u "test-golang/utils"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -37,7 +37,7 @@ func (event *Event) UpdateEvent(idEvent *string) map[string]interface{} {
 
 	temp := &Event{}
 
-	err := GetDB().Table("eve").Where("id = ?", *idEvent).First(temp).Error
+	err := GetDB().Table("events").Where("id = ?", *idEvent).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println(err)
 		return nil
@@ -74,7 +74,7 @@ func GetEvents() []*Event {
 
 	events := make([]*Event, 0)
 
-	err := GetDB().Table("events").Find(&events).Error
+	err := GetDB().Table("events").Order("dateevent").Find(&events).Error
 	if err != nil {
 		fmt.Println(err)
 		return nil

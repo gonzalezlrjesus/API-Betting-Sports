@@ -1,10 +1,10 @@
 package main
 
 import (
+	"API-Betting-Sports/routes"
 	"fmt"
 	"net/http"
 	"os"
-	"test-golang/routes"
 
 	"github.com/rs/cors"
 )
@@ -20,6 +20,7 @@ func main() {
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:4200"},
 		AllowCredentials: true,
+		AllowedMethods:   []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
 		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Accept-Encoding", "Cache-Control", "Authorization"},
 		// Enable Debugging for testing, consider disabling in production
 		Debug: true,

@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"net/http"
-	"test-golang/models"
-	u "test-golang/utils"
+	"API-Betting-Sports/models"
+	u "API-Betting-Sports/utils"
 
 	"github.com/gorilla/mux"
 )

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	u "test-golang/utils"
+	u "API-Betting-Sports/utils"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"

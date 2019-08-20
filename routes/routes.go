@@ -1,8 +1,8 @@
 package routes
 
 import (
-	w "test-golang/auth"
-	"test-golang/handlers"
+	w "API-Betting-Sports/auth"
+	"API-Betting-Sports/handlers"
 
 	"github.com/gorilla/mux"
 )

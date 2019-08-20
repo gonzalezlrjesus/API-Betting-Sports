@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 
-	u "test-golang/utils"
+	u "API-Betting-Sports/utils"
 
 	"github.com/jinzhu/gorm"
 )
