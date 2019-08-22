@@ -60,10 +60,11 @@ func GetOneEvent(idEvent *string) map[string]interface{} {
 	//check event specific in DB
 	err := GetDB().Table("events").Where("id = ?", *idEvent).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println("idEvent : ", err)
-		return u.Message(true, "idEvent no exist")
+		fmt.Println("Event : ", err)
+		return u.Message(true, "Event no exist")
 	}
-
+	fmt.Println("ERROR GET: ",err)
+	fmt.Println(temp.Dateevent)
 	response := u.Message(true, "Get Event")
 	response["event"] = temp
 	return response
