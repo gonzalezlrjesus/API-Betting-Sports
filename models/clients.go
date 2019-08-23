@@ -77,7 +77,7 @@ func LoginClient(identificationcard string) map[string]interface{} {
 func GetClient(idClient *string) (*Client, string) {
 
 	client := &Client{}
-	err := GetDB().Table("clients").Where("Identificationcard = ?", *idClient).First(client).Error
+	err := GetDB().Table("clients").Where("id = ?", *idClient).First(client).Error
 	if err != nil {
 		return nil, "Failed"
 	}
@@ -109,10 +109,10 @@ func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 		return resp
 	}
 
-	temp := &Client{Identificationcard: *idClient}
+	temp := &Client{}
 
 	//check client in DB
-	err := GetDB().Table("clients").Where("Identificationcard = ?", temp.Identificationcard).First(temp).Error
+	err := GetDB().Table("clients").Where("id = ?", idClient).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println(err)
 		return nil
@@ -140,19 +140,19 @@ func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 // UpdateStateClient client in DB
 func UpdateStateClient(idClient *string, setStateClient *Client) map[string]interface{} {
 
-	temp := &Client{Identificationcard: *idClient}
+	temp := &Client{}
 
 	//check client in DB
-	err := GetDB().Table("clients").Where("Identificationcard = ?", temp.Identificationcard).First(temp).Error
+	err := GetDB().Table("clients").Where("id = ?", *idClient).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println(err)
 		return nil
 	}
 
-	if setStateClient.State == "habilitado" {
-		temp.State = "bloqueado"
+	if setStateClient.State == "Habilitado" {
+		temp.State = "Bloqueado"
 	} else {
-		temp.State = "habilitado"
+		temp.State = "Habilitado"
 	}
 
 	GetDB().Save(&temp)
@@ -168,7 +168,7 @@ func DeleteClient(idClient *string) bool {
 
 	temp := &Client{}
 	// Select records
-	err := GetDB().Table("clients").Where("Identificationcard= ?", *idClient).First(temp).Error
+	err := GetDB().Table("clients").Where("id= ?", *idClient).First(temp).Error
 
 	if err != nil || err == gorm.ErrRecordNotFound {
 		return false
@@ -226,7 +226,7 @@ func (client *Client) ValidateClientParams(idClient *string) (map[string]interfa
 	}
 
 	// Data Param
-	err := GetDB().Table("clients").Where("Identificationcard = ?", *idClient).First(tempParam).Error
+	err := GetDB().Table("clients").Where("id = ?", *idClient).First(tempParam).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return u.Message(false, "Connection error. Please retry"), false
 	}
@@ -242,7 +242,7 @@ func (client *Client) ValidateClientParams(idClient *string) (map[string]interfa
 		return u.Message(false, "Connection error. Please retry"), false
 	}
 
-	if errAux != gorm.ErrRecordNotFound && tempForm.Identificationcard != *idClient {
+	if errAux != gorm.ErrRecordNotFound && tempForm.Identificationcard != tempParam.Identificationcard {
 		return u.Message(false, "there is client with this identification to send in Form"), false
 	}
 
