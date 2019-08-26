@@ -14,6 +14,7 @@ type Client struct {
 	gorm.Model
 	Name               string `json:"name"`
 	Identificationcard string `json:"identificationcard"`
+	Seudonimo					 string `json:"seudonimo"`
 	Email              string `json:"email"`
 	Phone              string `json:"phone"`
 	Banknumber         string `json:"banknumber"`
@@ -92,8 +93,7 @@ func GetClient(idClient *string) (*Client, string) {
 func GetClients() []*Client {
 
 	clients := make([]*Client, 0)
-
-	err := GetDB().Table("clients").Find(&clients).Error
+	err := GetDB().Table("clients").Order("seudonimo").Find(&clients).Error
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -120,6 +120,7 @@ func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 
 	temp.Email = client.Email
 	temp.Name = client.Name
+	temp.Seudonimo = client.Seudonimo
 	temp.Phone = client.Phone
 	temp.Banknumber = client.Banknumber
 	temp.Bankname = client.Bankname
@@ -200,6 +201,10 @@ func (client *Client) ValidateClient() (map[string]interface{}, bool) {
 		return u.Message(false, "Identificationcard is required"), false
 	}
 
+	if client.Seudonimo == "" {
+		return u.Message(false, "Seudonimo is required"), false
+	}
+
 	//check for errors and duplicate Identificationcard
 	err := GetDB().Table("clients").Where("Identificationcard = ?", client.Identificationcard).First(temp).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
@@ -208,6 +213,19 @@ func (client *Client) ValidateClient() (map[string]interface{}, bool) {
 
 	if temp.Identificationcard != "" {
 		return u.Message(false, "Identificationcard already in use by another user."), false
+	}
+
+	// Seudonimo must be unique
+	tempSeudonimo := &Client{}
+
+		//check for errors and duplicate Identificationcard
+	errSeudonimo := GetDB().Table("clients").Where("seudonimo = ?", client.Seudonimo).First(tempSeudonimo).Error
+	if errSeudonimo != nil && errSeudonimo != gorm.ErrRecordNotFound {
+		return u.Message(false, "Connection error. Please retry"), false
+	}
+
+	if tempSeudonimo.Seudonimo != "" {
+		return u.Message(false, "Seudonimo already in use by another user."), false
 	}
 
 	return u.Message(false, "Requirement passed"), true
@@ -223,6 +241,10 @@ func (client *Client) ValidateClientParams(idClient *string) (map[string]interfa
 
 	if client.Name == "" {
 		return u.Message(false, "Name is required"), false
+	}
+
+	if client.Seudonimo == "" {
+		return u.Message(false, "Seudonimo is required"), false
 	}
 
 	// Data Param
@@ -242,8 +264,18 @@ func (client *Client) ValidateClientParams(idClient *string) (map[string]interfa
 		return u.Message(false, "Connection error. Please retry"), false
 	}
 
-	if errAux != gorm.ErrRecordNotFound && tempForm.Identificationcard != tempParam.Identificationcard {
+	// Data form
+	tempSeudonimo := &Client{}
+	errSeudonimo := GetDB().Table("clients").Where("seudonimo = ?", client.Seudonimo).First(tempSeudonimo).Error
+	if errSeudonimo != nil && errSeudonimo != gorm.ErrRecordNotFound {
+		return u.Message(false, "Connection error. Please retry"), false
+	}
+
+	if  errAux != gorm.ErrRecordNotFound && tempForm.Identificationcard != tempParam.Identificationcard {
 		return u.Message(false, "there is client with this identification to send in Form"), false
+	} 
+	if errSeudonimo != gorm.ErrRecordNotFound && tempSeudonimo.Seudonimo != tempParam.Seudonimo {
+		return u.Message(false, "there is client with this Seudonimo to send in Form"), false
 	}
 
 	return u.Message(false, "Requirement passed"), true
