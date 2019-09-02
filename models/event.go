@@ -11,7 +11,14 @@ import (
 // Event struct
 type Event struct {
 	gorm.Model
-	Dateevent time.Time `json:"dateevent"`
+	Dateevent           time.Time 	`json:"dateevent"`
+	Hipodromo      		string 		`json:"hipodromo"`
+	Racingnumbers 		uint 		`json:"racingnumbers"`
+	Minimumamount   	uint   		`json:"minimumamount"`
+	Profitpercentage 	uint 		`json:"profitpercentage"`
+	Auctionnumber 		uint 		`json:"auctionnumber"`
+	TimebetweenAuctions uint 		`json:"timebetweenAuctions"`
+	Horsenotauction 	string 		`json:"horsenotauction"`
 }
 
 // CreateEvent Event db
@@ -23,12 +30,12 @@ func (event *Event) CreateEvent() map[string]interface{} {
 
 	GetDB().Create(event)
 
-	response := u.Message(true, "event add to System")
+	response := u.Message(true, "Event add to system")
 	response["event"] = event
 	return response
 }
 
-// UpdateEvent in DB
+// UpdateEvent in DB I MUST CORRECT IT, BECAUSE I UPDATE NEW DATA***
 func (event *Event) UpdateEvent(idEvent *string) map[string]interface{} {
 
 	if resp, ok := event.ValidateEventParams(idEvent); !ok {
@@ -44,6 +51,10 @@ func (event *Event) UpdateEvent(idEvent *string) map[string]interface{} {
 	}
 
 	temp.Dateevent = event.Dateevent
+	temp.Hipodromo = event.Hipodromo
+	temp.Racingnumbers = event.Racingnumbers
+	temp.Minimumamount = event.Minimumamount
+	temp.Profitpercentage = event.Profitpercentage
 
 	GetDB().Save(&temp)
 

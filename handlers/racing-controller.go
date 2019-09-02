@@ -1,54 +1,44 @@
 package handlers
 
 import (
+	"API-Betting-Sports/models"
+	u "API-Betting-Sports/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"API-Betting-Sports/models"
-	u "API-Betting-Sports/utils"
 
 	"github.com/gorilla/mux"
 )
 
-// paramsID struct params
-type paramsID struct {
-	idEvent  string
-	idRacing string
-}
-
 // CreateRacing Racing
 var CreateRacing = func(w http.ResponseWriter, r *http.Request) {
-
-	racing := &models.Racing{}
-	vars := mux.Vars(r)
-	idEvent := vars["idEvent"]
-
-	err := json.NewDecoder(r.Body).Decode(racing)
+	newsList := make([]models.Racing, 0)
+	err := json.NewDecoder(r.Body).Decode(&newsList)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Error while decoding request body"))
 		return
 	}
-	racing.Eventid = idEvent
-	resp := racing.CreateRacing()
+	vars := mux.Vars(r)
+	idEvent := vars["idEvent"]
+	tempUint64, _ := strconv.ParseUint(idEvent, 10, 32)
+	resp := models.CreateRacingModel(newsList, uint(tempUint64))
 	u.Respond(w, resp)
 }
 
 // UpdateRacing Racing
 var UpdateRacing = func(w http.ResponseWriter, r *http.Request) {
-	params := &paramsID{}
 	vars := mux.Vars(r)
-	params.idEvent = vars["idEvent"]
-	params.idRacing = vars["idRacing"]
+	idEvent := vars["idEvent"]
+	tempUint64, _ := strconv.ParseUint(idEvent, 10, 32)
 
-	racing := &models.Racing{}
-
-	err := json.NewDecoder(r.Body).Decode(racing) //decode the request body into struct and failed if any error occur
+	newsList := make([]models.Racing, 0)
+	err := json.NewDecoder(r.Body).Decode(&newsList)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request"))
+		u.Respond(w, u.Message(false, "Error while decoding request body"))
 		return
 	}
 
-	data := racing.UpdateRacing(&params.idEvent, &params.idRacing)
+	data := models.UpdateRacingModel(newsList, uint(tempUint64))
 	resp := u.Message(true, "Success")
 	resp["data"] = data
 	u.Respond(w, resp)
@@ -56,12 +46,11 @@ var UpdateRacing = func(w http.ResponseWriter, r *http.Request) {
 
 // DeleteRacing Racing
 var DeleteRacing = func(w http.ResponseWriter, r *http.Request) {
-	params := &paramsID{}
 	vars := mux.Vars(r)
-	params.idEvent = vars["idEvent"]
-	params.idRacing = vars["idRacing"]
+	idEvent := vars["idEvent"]
+	idRacing := vars["idRacing"]
 
-	data := models.DeleteRacing(&params.idEvent, &params.idRacing)
+	data := models.DeleteRacing(&idEvent, &idRacing)
 	resp := u.Message(true, strconv.FormatBool(data))
 	u.Respond(w, resp)
 }
@@ -79,12 +68,11 @@ var GetRacingsFor = func(w http.ResponseWriter, r *http.Request) {
 
 // GetSpecificRacing find and show Racing
 var GetSpecificRacing = func(w http.ResponseWriter, r *http.Request) {
-	params := &paramsID{}
 	vars := mux.Vars(r)
-	params.idEvent = vars["idEvent"]
-	params.idRacing = vars["idRacing"]
+	idEvent := vars["idEvent"]
+	idRacing := vars["idRacing"]
 
-	data := models.GetOneRacing(&params.idEvent, &params.idRacing)
+	data := models.GetOneRacing(&idEvent, &idRacing)
 	resp := u.Message(true, "GetSpecificRacing Success")
 	resp["data"] = data
 	u.Respond(w, resp)

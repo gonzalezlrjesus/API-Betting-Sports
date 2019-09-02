@@ -1,9 +1,9 @@
 package models
 
 import (
-	"fmt"
-
 	u "API-Betting-Sports/utils"
+	"fmt"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -11,46 +11,58 @@ import (
 // Racing struct
 type Racing struct {
 	gorm.Model
-	Eventid   string `json:"eventid"`
-	Hipodromo string `json:"hipodromo"`
+	Eventid      uint      `json:"eventid"`
+	Starttime    time.Time `json:"starttime"`
+	Horsenumbers uint      `json:"horsenumbers"`
+	Auctiontime  time.Time `json:"auctiontime"`
+	Alerttime    time.Time `json:"alerttime"`
+	Stateracing  string    `json:"stateracing"`
 }
 
-// CreateRacing db
-func (racing *Racing) CreateRacing() map[string]interface{} {
+// ListRacings struct test
+type ListRacings struct {
+	Arrayracing []Racing
+}
 
-	if resp, ok := racing.ValidateRacing(); !ok {
-		return resp
+// CreateRacingModel db
+func CreateRacingModel(Arrayracing []Racing, idEvent uint) map[string]interface{} {
+	for i := range Arrayracing {
+		Arrayracing[i].Eventid = idEvent
+		if resp, ok := Arrayracing[i].ValidateRacing(); !ok {
+			return resp
+		}
+
+		err := GetDB().Create(&Arrayracing[i]).Error
+		fmt.Println("err:, ", err)
 	}
 
-	GetDB().Create(racing)
-
-	response := u.Message(true, "Racing has been created")
-	response["Components"] = CreateRacingComponents(racing.Model.ID)
-	response["racing"] = racing
+	response := u.Message(true, "Racings has been created")
+	response["Arrayracing"] = Arrayracing
 	return response
 }
 
-// UpdateRacing in DB
-func (racing *Racing) UpdateRacing(idEvent, idRacing *string) map[string]interface{} {
+// UpdateRacingModel in DB
+func UpdateRacingModel(Arrayracing []Racing, idEvent uint) map[string]interface{} {
 
-	if resp, ok := racing.ValidateEventRacingParams(idEvent, idRacing); !ok {
+	if resp, ok := ValidateEventRacingParams(&idEvent); !ok {
 		return resp
 	}
 
-	temp := &Racing{}
+	for i := range Arrayracing {
 
-	err := GetDB().Table("racings").Where("id = ?", *idRacing).First(temp).Error
-	if err == gorm.ErrRecordNotFound {
-		fmt.Println(err)
-		return nil
+		temp := &Racing{}
+		err := GetDB().Table("racings").Where("id = ?", Arrayracing[i].ID).First(temp).Error
+		if err == gorm.ErrRecordNotFound {
+			fmt.Println(err)
+			return nil
+		}
+		temp = &Arrayracing[i]
+
+		err = GetDB().Save(&temp).Error
+		fmt.Println("err:, ", err)
 	}
 
-	temp.Hipodromo = racing.Hipodromo
-
-	GetDB().Save(&temp)
-
-	response := u.Message(true, "Racing has been updated")
-	response["racing"] = temp
+	response := u.Message(true, "Racings has been updated")
 	return response
 
 }
@@ -144,9 +156,9 @@ func DeleteRacings(idComponent *string) bool {
 // ValidateRacing struct that Front-End to Back-End
 func (racing *Racing) ValidateRacing() (map[string]interface{}, bool) {
 
-	if racing.Hipodromo == "" {
-		return u.Message(false, "Hipodromo is required"), false
-	}
+	// if racing.Hipodromo == "" {
+	// 	return u.Message(false, "Hipodromo is required"), false
+	// }
 
 	temp := &Racing{}
 	//check Event in DB
@@ -160,11 +172,7 @@ func (racing *Racing) ValidateRacing() (map[string]interface{}, bool) {
 }
 
 // ValidateEventRacingParams struct Params for Update Racing
-func (racing *Racing) ValidateEventRacingParams(idEvent, idRacing *string) (map[string]interface{}, bool) {
-
-	if racing.Hipodromo == "" {
-		return u.Message(false, "Hipodromo is required"), false
-	}
+func ValidateEventRacingParams(idEvent *uint) (map[string]interface{}, bool) {
 
 	tempIDevent := &Event{}
 
@@ -173,23 +181,6 @@ func (racing *Racing) ValidateEventRacingParams(idEvent, idRacing *string) (map[
 	if erridEvent == gorm.ErrRecordNotFound {
 		fmt.Println(erridEvent)
 		return u.Message(false, "Not found ID Event Param"), false
-	}
-
-	if erridEvent == gorm.ErrRecordNotFound {
-		return u.Message(false, "Not found ID Event Param"), false
-	}
-
-	tempIDRacing := &Racing{}
-
-	// Search idEvent in DB
-	erridRacing := GetDB().Table("racings").Where("id = ?", *idRacing).First(tempIDRacing).Error
-	if erridRacing == gorm.ErrRecordNotFound {
-		fmt.Println(erridRacing)
-		return u.Message(false, "Not found ID Racing Param"), false
-	}
-
-	if erridRacing == gorm.ErrRecordNotFound {
-		return u.Message(false, "Not found ID Racing Param"), false
 	}
 
 	return u.Message(false, "Requirement passed"), true

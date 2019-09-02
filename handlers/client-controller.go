@@ -1,11 +1,11 @@
 package handlers
 
 import (
+	"API-Betting-Sports/models"
+	u "API-Betting-Sports/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"API-Betting-Sports/models"
-	u "API-Betting-Sports/utils"
 
 	"github.com/gorilla/mux"
 )

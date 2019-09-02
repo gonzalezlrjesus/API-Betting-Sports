@@ -1,11 +1,11 @@
 package handlers
 
 import (
+	"API-Betting-Sports/models"
+	u "API-Betting-Sports/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"API-Betting-Sports/models"
-	u "API-Betting-Sports/utils"
 
 	"github.com/gorilla/mux"
 )
@@ -19,18 +19,17 @@ type ParamsID struct {
 // CreateHorse add a new Horse to db
 var CreateHorse = func(w http.ResponseWriter, r *http.Request) {
 
-	horse := &models.Horse{}
 	vars := mux.Vars(r)
 	idRacing := vars["idRacing"]
 
-	err := json.NewDecoder(r.Body).Decode(horse)
+	newsList := make([]models.Horse, 0)
+	err := json.NewDecoder(r.Body).Decode(&newsList)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Error while decoding request body"))
 		return
 	}
 	tempUint64, _ := strconv.ParseUint(idRacing, 10, 32)
-	horse.Racingid = uint(tempUint64)
-	resp := horse.CreateHorse()
+	resp := models.CreateHorseModel(newsList, uint(tempUint64))
 	u.Respond(w, resp)
 }
 

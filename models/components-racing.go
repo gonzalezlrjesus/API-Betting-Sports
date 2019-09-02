@@ -3,34 +3,20 @@ package models
 import (
 	"fmt"
 	u "API-Betting-Sports/utils"
-
 	"github.com/jinzhu/gorm"
 )
 
 // RacingComponents struct
 type RacingComponents struct {
 	gorm.Model
-	Racingid        uint   `json:"racingid"`
-	Stateracing     string `json:"stateracing"`
-	Minimumamount   uint   `json:"minimunamount"`
-	Percentage      uint   `json:"percentage"`
-	Timeduration    uint   `json:"timeduration"`
-	Horsenamestate  bool   `json:"horsenamestate"`
-	Horsenotauction string `json:"horsenotauction"`
-	Jockeynamestate bool   `json:"jockeynamestate"`
+	Racingid        uint   		`json:"racingid"`
+
 }
 
 // CreateRacingComponents Racing Components db
 func CreateRacingComponents(RacingID uint) map[string]interface{} {
 	racingComponents := &RacingComponents{
 		Racingid:        RacingID,
-		Stateracing:     "En Espera",
-		Minimumamount:   1000.00,
-		Percentage:      20,
-		Timeduration:    5,
-		Horsenamestate:  true,
-		Horsenotauction: "CASA",
-		Jockeynamestate: true,
 	}
 
 	GetDB().Create(racingComponents)
@@ -51,14 +37,6 @@ func (racingcomponents *RacingComponents) UpdateRacingComponents(RacingID string
 		fmt.Println("Racing has not found : ", err)
 		return u.Message(true, "Racing Components has NOT updated")
 	}
-
-	temp.Stateracing = racingcomponents.Stateracing
-	temp.Minimumamount = racingcomponents.Minimumamount
-	temp.Percentage = racingcomponents.Percentage
-	temp.Timeduration = racingcomponents.Timeduration
-	temp.Horsenamestate = racingcomponents.Horsenamestate
-	temp.Horsenotauction = racingcomponents.Horsenotauction
-	temp.Jockeynamestate = racingcomponents.Jockeynamestate
 
 	GetDB().Save(&temp)
 

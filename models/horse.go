@@ -13,21 +13,29 @@ type Horse struct {
 	gorm.Model
 	Racingid      uint   `json:"racingid"`
 	Horsename     string `json:"horsename"`
-	Jockeyname    string `json:"jockeyname"`
+	Numero        uint   `json:"numero"`
 	Finalposition string `json:"finalposition"`
 }
 
-// CreateHorse add a new race horse to db in the table Horse
-func (horse *Horse) CreateHorse() map[string]interface{} {
+// CreateHorseModel add a new race horse array to db in the table Horse
+func CreateHorseModel(Arrayhorse []Horse, idRacing uint) map[string]interface{} {
 
-	if resp, ok := horse.ValidateHorse(); !ok {
+	if resp, ok := ValidateHorse(idRacing); !ok {
 		return resp
 	}
 
-	GetDB().Create(horse)
+	for i := range Arrayhorse {
+		Arrayhorse[i].Racingid = idRacing
+		// if resp, ok := Arrayhorse[i].ValidateRacing(); !ok {
+		// 	return resp
+		// }
+
+		err := GetDB().Create(&Arrayhorse[i]).Error
+		fmt.Println("err:, ", err)
+	}
 
 	response := u.Message(true, "Horse has been created")
-	response["horse"] = horse
+	response["horse"] = Arrayhorse
 	return response
 }
 
@@ -47,7 +55,6 @@ func (horse *Horse) UpdateHorse(idRacing, idHorse *string) map[string]interface{
 	}
 
 	temp.Horsename = horse.Horsename
-	temp.Jockeyname = horse.Jockeyname
 	temp.Finalposition = horse.Finalposition
 
 	GetDB().Save(&temp)
@@ -116,15 +123,15 @@ func DeleteAllHorses(idRacing uint) bool {
 // ---------------------------Validations------------------------------
 
 // ValidateHorse struct that Front-End to Back-End
-func (horse *Horse) ValidateHorse() (map[string]interface{}, bool) {
+func ValidateHorse(racingID uint) (map[string]interface{}, bool) {
 
-	if horse.Horsename == "" {
-		return u.Message(false, "Horse name is required"), false
-	}
+	// if horse.Horsename == "" {
+	// 	return u.Message(false, "Horse name is required"), false
+	// }
 
 	temp := &Racing{}
 	//check Racing in DB
-	err := GetDB().Table("racings").Where("id = ?", horse.Racingid).First(temp).Error
+	err := GetDB().Table("racings").Where("id = ?", racingID).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("Racing", err)
 		return u.Message(false, "Racing exist no in DB"), false

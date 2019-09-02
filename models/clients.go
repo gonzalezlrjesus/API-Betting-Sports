@@ -1,9 +1,9 @@
 package models
 
 import (
+	u "API-Betting-Sports/utils"
 	"fmt"
 	"os"
-	u "API-Betting-Sports/utils"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
@@ -14,7 +14,7 @@ type Client struct {
 	gorm.Model
 	Name               string `json:"name"`
 	Identificationcard string `json:"identificationcard"`
-	Seudonimo					 string `json:"seudonimo"`
+	Seudonimo          string `json:"seudonimo"`
 	Email              string `json:"email"`
 	Phone              string `json:"phone"`
 	Banknumber         string `json:"banknumber"`
@@ -218,7 +218,7 @@ func (client *Client) ValidateClient() (map[string]interface{}, bool) {
 	// Seudonimo must be unique
 	tempSeudonimo := &Client{}
 
-		//check for errors and duplicate Identificationcard
+	//check for errors and duplicate Identificationcard
 	errSeudonimo := GetDB().Table("clients").Where("seudonimo = ?", client.Seudonimo).First(tempSeudonimo).Error
 	if errSeudonimo != nil && errSeudonimo != gorm.ErrRecordNotFound {
 		return u.Message(false, "Connection error. Please retry"), false
@@ -271,9 +271,9 @@ func (client *Client) ValidateClientParams(idClient *string) (map[string]interfa
 		return u.Message(false, "Connection error. Please retry"), false
 	}
 
-	if  errAux != gorm.ErrRecordNotFound && tempForm.Identificationcard != tempParam.Identificationcard {
+	if errAux != gorm.ErrRecordNotFound && tempForm.Identificationcard != tempParam.Identificationcard {
 		return u.Message(false, "there is client with this identification to send in Form"), false
-	} 
+	}
 	if errSeudonimo != gorm.ErrRecordNotFound && tempSeudonimo.Seudonimo != tempParam.Seudonimo {
 		return u.Message(false, "there is client with this Seudonimo to send in Form"), false
 	}
