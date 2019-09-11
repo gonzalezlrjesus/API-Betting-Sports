@@ -48,7 +48,7 @@ func UpdateIdentificationCoinClient(Clientidentificationcard, newIdentification 
 	temp := &Coins{}
 
 	//check Client identificaciont in DB
-	err := GetDB().Table("coins").Where("ClientIdentificationcard = ?", Clientidentificationcard).First(temp).Error
+	err := GetDB().Table("coins").Where("clientidentificationcard = ?", Clientidentificationcard).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("client has not found : ", err)
 		return u.Message(true, "client has NOT updated your coins")
@@ -68,7 +68,7 @@ func GetCoinsClient(idClient *string) map[string]interface{} {
 	temp := &Coins{}
 
 	//check deposits ALL in DB
-	err := GetDB().Table("coins").Where("ClientIdentificationcard = ?", *idClient).First(temp).Error
+	err := GetDB().Table("coins").Where("clientidentificationcard = ?", *idClient).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("GetCoinsClient : ", err)
 		return u.Message(true, "Client no exist")
@@ -85,7 +85,7 @@ func DeleteCoinsClient(Clientidentificationcard string) bool {
 	temp := &[]Deposit{}
 
 	//check Client coins in DB
-	err := GetDB().Table("coins").Where("ClientIdentificationcard LIKE ?", Clientidentificationcard).Delete(temp).Error
+	err := GetDB().Table("coins").Where("clientidentificationcard LIKE ?", Clientidentificationcard).Delete(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("Client coins ALL : ", err)
 		return false

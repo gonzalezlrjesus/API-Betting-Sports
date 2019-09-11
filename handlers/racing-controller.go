@@ -69,10 +69,11 @@ var GetRacingsFor = func(w http.ResponseWriter, r *http.Request) {
 // GetSpecificRacing find and show Racing
 var GetSpecificRacing = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	idEvent := vars["idEvent"]
+	// idEvent := vars["idEvent"]
 	idRacing := vars["idRacing"]
 
-	data := models.GetOneRacing(&idEvent, &idRacing)
+	// data := models.GetOneRacing(&idEvent, &idRacing)
+	data := models.GetOneRacing(&idRacing)
 	resp := u.Message(true, "GetSpecificRacing Success")
 	resp["data"] = data
 	u.Respond(w, resp)

@@ -28,6 +28,9 @@ func (event *Event) CreateEvent() map[string]interface{} {
 		return resp
 	}
 
+    event.Auctionnumber = 3
+    event.TimebetweenAuctions = 5
+    event.Horsenotauction = "casa"
 	GetDB().Create(event)
 
 	response := u.Message(true, "Event add to system")
@@ -52,7 +55,6 @@ func (event *Event) UpdateEvent(idEvent *string) map[string]interface{} {
 
 	temp.Dateevent = event.Dateevent
 	temp.Hipodromo = event.Hipodromo
-	temp.Racingnumbers = event.Racingnumbers
 	temp.Minimumamount = event.Minimumamount
 	temp.Profitpercentage = event.Profitpercentage
 
@@ -74,8 +76,7 @@ func GetOneEvent(idEvent *string) map[string]interface{} {
 		fmt.Println("Event : ", err)
 		return u.Message(true, "Event no exist")
 	}
-	fmt.Println("ERROR GET: ",err)
-	fmt.Println(temp.Dateevent)
+
 	response := u.Message(true, "Get Event")
 	response["event"] = temp
 	return response
@@ -105,10 +106,10 @@ func DeleteEvent(idEvent *string) bool {
 	if err != nil || err == gorm.ErrRecordNotFound {
 		return false
 	}
-
+	DeleteRacings(temp.ID)
 	// Delete it
 	GetDB().Delete(temp)
-	DeleteRacings(idEvent)
+	// DeleteRacings(idEvent)
 	return true
 }
 

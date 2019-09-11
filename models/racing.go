@@ -68,11 +68,13 @@ func UpdateRacingModel(Arrayracing []Racing, idEvent uint) map[string]interface{
 }
 
 // GetOneRacing Racing
-func GetOneRacing(idEvent, idRacing *string) map[string]interface{} {
+// func GetOneRacing(idEvent, idRacing *string) map[string]interface{} {
+func GetOneRacing(idRacing *string) map[string]interface{} {
 	temp := &Racing{}
 
 	//check racing specific in DB
-	err := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, *idEvent).First(temp).Error
+	// err := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, *idEvent).First(temp).Error
+	err := GetDB().Table("racings").Where("id= ?", *idRacing).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("Racing : ", err)
 		return u.Message(true, "Racing no exist")
@@ -124,11 +126,11 @@ func DeleteRacing(idEvent, idRacing *string) bool {
 }
 
 // DeleteRacings delete all racings
-func DeleteRacings(idComponent *string) bool {
+func DeleteRacings(idComponent uint) bool {
 
 	racings := &[]Racing{}
 
-	errRacings := GetDB().Table("racings").Where("eventid = ?", *idComponent).Find(&racings).Error
+	errRacings := GetDB().Table("racings").Where("eventid = ?", idComponent).Find(&racings).Error
 	if errRacings != nil {
 		fmt.Println(errRacings)
 		return false
@@ -136,15 +138,18 @@ func DeleteRacings(idComponent *string) bool {
 
 	tempDelete := &[]Racing{}
 
+	// idEvent := *idComponent
+	// tempUint64, _ := strconv.ParseUint(idEvent, 10, 32)
+
 	// delete all racings
-	err := GetDB().Table("racings").Where("eventid LIKE ?", *idComponent).Delete(tempDelete).Error
+	err := GetDB().Table("racings").Where("eventid = ?", idComponent).Delete(tempDelete).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("Racingcomponentid  : ", err)
 		return false
 	}
-
+		fmt.Println("Error  : ", err)
 	for _, JustRace := range *racings {
-		DeleteRacingComponents(JustRace.ID)
+		// DeleteRacingComponents(JustRace.ID)
 		DeleteAllHorses(JustRace.ID)
 	}
 

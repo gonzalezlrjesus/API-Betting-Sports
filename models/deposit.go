@@ -13,7 +13,7 @@ type Deposit struct {
 	Amount                   float64 `json:"amount"`
 	Clientidentificationcard string  `json:"clientidentificationcard"`
 	FormaPago                string  `json:"formapago"`
-	Serial                   string  `json:"serial"`
+	Serial                   uint  `json:"serial"`
 }
 
 // AddDepositClient Client db

@@ -46,7 +46,7 @@ func Routes() *mux.Router {
 	// To a specific event
 	router.HandleFunc("/api/admin/event/{idEvent}", handlers.GetSpecificEvent).Methods("GET")
 	// To a specific Racing
-	router.HandleFunc("/api/admin/event/{idEvent}/racing/{idRacing}", handlers.GetSpecificRacing).Methods("GET")
+	router.HandleFunc("/api/admin/racing/{idRacing}", handlers.GetSpecificRacing).Methods("GET")
 	// To a specific Racing Components
 	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.GetRacingComponents).Methods("GET")
 
