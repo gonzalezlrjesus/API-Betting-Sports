@@ -3,12 +3,14 @@ package routes
 import (
 	w "API-Betting-Sports/auth"
 	"API-Betting-Sports/handlers"
+	"API-Betting-Sports/models"
 
 	"github.com/gorilla/mux"
 )
 
 // Routes all routes
 func Routes() *mux.Router {
+	go models.Manager.Start()
 	router := mux.NewRouter()
 
 	// -------------------Routes Admin---------------------------------------
@@ -86,6 +88,11 @@ func Routes() *mux.Router {
 
 	// Login Client
 	router.HandleFunc("/api/clients/login", handlers.AuthenticateClient).Methods("POST")
+
+	// ------------------ WEBSOCKET ----------------------------
+
+	// websocket to auctions
+	router.HandleFunc("/ws", handlers.WsPage)
 
 	// ------------------Middleware Auth Token JWT----------------------------
 	router.Use(w.JwtAuthentication) //attach JWT auth middleware

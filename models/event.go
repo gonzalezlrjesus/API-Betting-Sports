@@ -83,17 +83,20 @@ func GetOneEvent(idEvent *string) map[string]interface{} {
 }
 
 // GetEvents all events of table events
-func GetEvents() []*Event {
+func GetEvents()  map[string]interface{} {
 
 	events := make([]*Event, 0)
 
 	err := GetDB().Table("events").Order("dateevent").Find(&events).Error
 	if err != nil {
-		fmt.Println(err)
+		// fmt.Println(err)
 		return nil
 	}
 
-	return events
+	response := u.Message(true, "Get Event")
+	response["events"] = events
+	response["time"] = time.Now()
+	return response
 }
 
 // DeleteEvent from DB

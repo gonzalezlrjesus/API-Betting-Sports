@@ -104,7 +104,7 @@ func Login(email, password string) map[string]interface{} {
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	tokenString, err := token.SignedString([]byte(os.Getenv("token_password")))
 	if err != nil {
-		fmt.Println("sas", err)
+		// fmt.Println("sas", err)
 		fmt.Println(err)
 	}
 	account.Token = tokenString //Store the token in the response

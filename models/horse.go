@@ -72,7 +72,7 @@ func GetHorses(idRacing *string) map[string]interface{} {
 
 	err := GetDB().Table("horses").Where("Racingid = ?", *idRacing).Find(&horses).Error
 	if err != nil {
-		fmt.Println(err)
+		// fmt.Println(err)
 		return nil
 	}
 

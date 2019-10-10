@@ -28,7 +28,7 @@ func init() {
 
 	conn, err := gorm.Open("postgres", dbURI)
 	if err != nil {
-		fmt.Print(err)
+		// fmt.Print(err)
 	}
 	db = conn
 	conn.Debug().AutoMigrate(&Admin{}, &Client{}, &Coins{}, &Deposit{}, &Event{}, &Racing{}, &Horse{})

@@ -49,13 +49,14 @@ func (client *Client) CreateClient() map[string]interface{} {
 }
 
 // LoginClient function user
-func LoginClient(identificationcard string) map[string]interface{} {
-
+func LoginClient(seudonimo string) map[string]interface{} {
+	// fmt.Println("Seudonimo Model:", seudonimo)
 	client := &Client{}
-	err := GetDB().Table("clients").Where("Identificationcard = ?", identificationcard).First(client).Error
+	err := GetDB().Table("clients").Where("seudonimo = ?", seudonimo).First(client).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return u.Message(false, "Cedula not found")
+			fmt.Println("err:", err)
+			return u.Message(false, "seudonimo not found")
 		}
 		return u.Message(false, "Connection error. Please retry")
 	}
@@ -65,7 +66,7 @@ func LoginClient(identificationcard string) map[string]interface{} {
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	tokenString, err := token.SignedString([]byte(os.Getenv("token_password")))
 	if err != nil {
-		fmt.Println("sas", err)
+		// fmt.Println("sas", err)
 	}
 	client.Token = tokenString //Store the token in the response
 
@@ -95,7 +96,7 @@ func GetClients() []*Client {
 	clients := make([]*Client, 0)
 	err := GetDB().Table("clients").Order("seudonimo").Find(&clients).Error
 	if err != nil {
-		fmt.Println(err)
+		// fmt.Println(err)
 		return nil
 	}
 

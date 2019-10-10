@@ -63,7 +63,7 @@ func UpdateIdentificationClientDeposit(Clientidentificationcard, newIdentificati
 
 	//check client identificacion in deposit table ALL in DB
 	err := GetDB().Table("deposits").Where("ClientIdentificationcard = ?", Clientidentificationcard).Update("clientidentificationcard", newIdentification).Error
-	fmt.Println("error deposits", err)
+	// fmt.Println("error deposits", err)
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("deposits ALL : ", err)
 		return nil
