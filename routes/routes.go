@@ -51,6 +51,8 @@ func Routes() *mux.Router {
 	router.HandleFunc("/api/admin/racing/{idRacing}", handlers.GetSpecificRacing).Methods("GET")
 	// To a specific Racing Components
 	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.GetRacingComponents).Methods("GET")
+	// To a specific remates Racings
+	router.HandleFunc("/api/admin/{idRacing}/remates", handlers.RematesRacing).Methods("GET")
 
 	// Update Client
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.UpdateClient).Methods("PUT")

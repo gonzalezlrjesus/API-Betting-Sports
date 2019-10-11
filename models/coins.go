@@ -42,6 +42,19 @@ func (coins *Coins) UpdateCoins(amountDeposit float64) map[string]interface{} {
 
 }
 
+// DecreaseCoins of client in DB
+func (coins *Coins) DecreaseCoins(rematesAmount float64) map[string]interface{} {
+
+	coins.Amount = ((coins.Amount) - rematesAmount)
+	fmt.Printf("%f\n", coins.Amount)
+	GetDB().Save(&coins)
+
+	response := u.Message(true, "client has updated your coins")
+	response["coins"] = coins
+	return response
+
+}
+
 // UpdateIdentificationCoinClient client identification in coins table of DB
 func UpdateIdentificationCoinClient(Clientidentificationcard, newIdentification string) map[string]interface{} {
 

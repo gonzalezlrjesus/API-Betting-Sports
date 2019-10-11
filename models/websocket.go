@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/jinzhu/gorm"
 )
 
 // ClientManager model ClientManager
@@ -40,6 +41,7 @@ type MatrixRemates struct {
 	MatrixRow int
 	MatrixCol int
 	Seudonimo string
+	idCaballo int
 }
 
 // Manager export to controller
@@ -135,6 +137,7 @@ func (manager *ClientManager) Start() {
 func (manager *ClientManager) Send(message []byte, ignore *Clientmodel) {
 	for conn := range manager.clients {
 		if conn != ignore {
+			// fmt.Println("Send Send :", string(message))
 			conn.Send <- message
 		}
 	}
@@ -169,19 +172,102 @@ func (c *Clientmodel) Read() {
 		matrixRowfloat64 := int(parsedData2["matrixRow"].(float64))
 		matrixColfloat64 := int(parsedData2["matrixCol"].(float64))
 		seudonimoActual := parsedData2["seudonimo"].(string)
+		idhorse := int(parsedData2["idcaballo"].(float64))
 
 		var a MatrixRemates // a == Student{"", 0}
 		a.Monto = matrixfloat64
 		a.MatrixRow = matrixRowfloat64
 		a.MatrixCol = matrixColfloat64
 		a.Seudonimo = seudonimoActual
+		a.idCaballo = idhorse
 
-		actualPosition.MatrixCol = int(parsedData2["matrixColSiguiente"].(float64))
+		var respaldoActual MatrixRemates // a == Student{"", 0}
+		respaldoActual.Monto = actualPosition.Monto
+		respaldoActual.MatrixRow = actualPosition.MatrixRow
+		respaldoActual.MatrixCol = actualPosition.MatrixCol
+		respaldoActual.Seudonimo = actualPosition.Seudonimo
+		respaldoActual.idCaballo = actualPosition.idCaballo
+
+		actualPosition.Monto = a.Monto
 		actualPosition.MatrixRow = int(parsedData2["matrixRowSiguiente"].(float64))
+		actualPosition.MatrixCol = int(parsedData2["matrixColSiguiente"].(float64))
+		actualPosition.Seudonimo = a.Seudonimo
+		actualPosition.idCaballo = a.idCaballo
 
-		fmt.Println("actualPosition : ", actualPosition)
+		// actualPosition.MatrixCol = int(parsedData2["matrixColSiguiente"].(float64))
+		fmt.Println("actualPosition BEFORE ---", actualPosition)
+		fmt.Println("          a MatrixRemates BEFORE ---", a)
+		fmt.Println("                                     respaldoActual BEFORE ---", respaldoActual)
+		// TEST Reducir cantidad de coins si se termina la seccion del remate del caballo
+		// osea si la siguiente row es porque termino de rematar el caballo
 
-		arrayRemates = append(arrayRemates, a)
+		if respaldoActual != actualPosition {
+			if a.Seudonimo == "CASA" {
+				fmt.Println("CASA se guarda a A")
+				CreateRemates(109, a.idCaballo, a.Seudonimo, a.Monto)
+
+			} else if a.Seudonimo == "vacio" {
+				fmt.Println("vacio se guarda a actual")
+				client := &Client{}
+				err := GetDB().Table("clients").Where("seudonimo = ?", respaldoActual.Seudonimo).First(client).Error
+				if err != nil {
+					if err == gorm.ErrRecordNotFound {
+						fmt.Println("err not found seudonimo websocket:", err)
+
+					}
+
+				}
+				fmt.Println("client get", client)
+				temp := &Coins{Clientidentificationcard: client.Identificationcard}
+
+				//check client_Coins in DB
+				errCoins := GetDB().Table("coins").Where("ClientIdentificationcard = ?", temp.Clientidentificationcard).First(temp).Error
+				if errCoins == gorm.ErrRecordNotFound {
+					fmt.Println("Client Coins not found ClientIdentificationcard websocket: ", errCoins)
+
+				}
+
+				temp.DecreaseCoins(float64(respaldoActual.Monto))
+				CreateRemates(109, respaldoActual.idCaballo, respaldoActual.Seudonimo, respaldoActual.Monto)
+			} else if a.MatrixCol == 2 && a.Monto != -1 {
+				fmt.Println("TERCERA CASILLA FULL se guarda a MatrixRemates")
+				client := &Client{}
+				err := GetDB().Table("clients").Where("seudonimo = ?", a.Seudonimo).First(client).Error
+				if err != nil {
+					if err == gorm.ErrRecordNotFound {
+						fmt.Println("err not found seudonimo websocket:", err)
+
+					}
+
+				}
+				fmt.Println("client get", client)
+				temp := &Coins{Clientidentificationcard: client.Identificationcard}
+
+				//check client_Coins in DB
+				errCoins := GetDB().Table("coins").Where("ClientIdentificationcard = ?", temp.Clientidentificationcard).First(temp).Error
+				if errCoins == gorm.ErrRecordNotFound {
+					fmt.Println("Client Coins not found ClientIdentificationcard websocket: ", errCoins)
+
+				}
+
+				temp.DecreaseCoins(float64(a.Monto))
+				CreateRemates(109, a.idCaballo, a.Seudonimo, a.Monto)
+			}
+			// }
+		}
+
+		// actualPosition.MatrixRow = int(parsedData2["matrixRowSiguiente"].(float64))
+
+		// actualPosition.Monto = a.Monto
+		// actualPosition.MatrixRow = int(parsedData2["matrixRowSiguiente"].(float64))
+		// actualPosition.MatrixCol = int(parsedData2["matrixColSiguiente"].(float64))
+		// actualPosition.Seudonimo = a.Seudonimo
+		// actualPosition.idCaballo = a.idCaballo
+		// fmt.Println("actualPosition AFTER ---: ", actualPosition)
+
+		if a.Monto != -1 {
+			arrayRemates = append(arrayRemates, a)
+		}
 
 		fmt.Println("arrayRemates:", arrayRemates)
 
