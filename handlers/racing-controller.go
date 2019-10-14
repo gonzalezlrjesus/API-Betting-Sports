@@ -78,3 +78,16 @@ var GetSpecificRacing = func(w http.ResponseWriter, r *http.Request) {
 	resp["data"] = data
 	u.Respond(w, resp)
 }
+
+// GetSpecificRacing find and show Racing within event
+var GetSpecificRacingWithEvent = func(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idEvent := vars["idEvent"]
+	idRacing := vars["idRacing"]
+
+	// data := models.GetOneRacing(&idEvent, &idRacing)
+	data := models.FindRacingWithinEvent(&idEvent, &idRacing)
+	resp := u.Message(true, "GetSpecificRacing Success")
+	resp["data"] = data
+	u.Respond(w, resp)
+}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-
+	"reflect"
 	"github.com/gorilla/websocket"
 	"github.com/jinzhu/gorm"
 )
@@ -55,7 +55,8 @@ var Manager = ClientManager{
 var myInt8 int8 = 16
 var arrayRemates []MatrixRemates
 var actualPosition MatrixRemates
-
+var idCarrera string
+var finalizacion string
 // Debo hallar una forma de almacenar todos los eventos que han transcurrido
 // para que cuando ingrese un cliente se le refleje todo lo que ha ocurrido
 // y tener la row y col actual osea que el size de la matrix debe ser
@@ -68,9 +69,9 @@ func (manager *ClientManager) Start() {
 		select {
 		case conn := <-manager.Register:
 
-			if len(manager.clients) > 0 {
+			// if len(manager.clients) > 0 {
 
-			}
+			// }
 
 			manager.clients[conn] = true
 			jsonMessage, _ := json.Marshal(&Message{Sender: "NewConnection", Content: "/A socket NEW.", Matrix: arrayRemates, Actualposition: actualPosition})
@@ -107,7 +108,7 @@ func (manager *ClientManager) Start() {
 
 			if len(manager.clients) == 0 {
 				myInt8 = 15
-				arrayRemates = nil
+				// arrayRemates = nil
 			}
 
 			if len(manager.clients) > 0 {
@@ -168,6 +169,13 @@ func (c *Clientmodel) Read() {
 		errjson := json.Unmarshal([]byte(s), &parsedData2)
 		fmt.Println("errjson: *** ", errjson)
 
+		// TEST *********
+		fmt.Println("parsedData2: ", parsedData2)
+		fmt.Println("parsedData2[idcarrera]: ", reflect.TypeOf(parsedData2["idcarrera"]))
+		fmt.Println("parsedData2[finalizo]: ", reflect.TypeOf(parsedData2["finalizo"]))
+		idCarrera = parsedData2["idcarrera"].(string)
+		finalizacion = parsedData2["finalizo"].(string)
+
 		matrixfloat64 := int64(parsedData2["matrix"].(float64))
 		matrixRowfloat64 := int(parsedData2["matrixRow"].(float64))
 		matrixColfloat64 := int(parsedData2["matrixCol"].(float64))
@@ -204,7 +212,13 @@ func (c *Clientmodel) Read() {
 		if respaldoActual != actualPosition {
 			if a.Seudonimo == "CASA" {
 				fmt.Println("CASA se guarda a A")
-				CreateRemates(109, a.idCaballo, a.Seudonimo, a.Monto)
+				CreateRemates(idCarrera, a.idCaballo, a.Seudonimo, a.Monto)
+			fmt.Println("FINALIZO ", finalizacion)
+								if finalizacion == "finalizo" {
+									fmt.Println("FINALIZO ", finalizacion)
+					 arrayRemates = nil
+					 CloseRacing(idCarrera)
+				}
 
 			} else if a.Seudonimo == "vacio" {
 				fmt.Println("vacio se guarda a actual")
@@ -228,7 +242,15 @@ func (c *Clientmodel) Read() {
 				}
 
 				temp.DecreaseCoins(float64(respaldoActual.Monto))
-				CreateRemates(109, respaldoActual.idCaballo, respaldoActual.Seudonimo, respaldoActual.Monto)
+				CreateRemates(idCarrera, respaldoActual.idCaballo, respaldoActual.Seudonimo, respaldoActual.Monto)
+
+								fmt.Println("FINALIZO ", finalizacion)
+								if finalizacion == "finalizo" {
+									fmt.Println("TERMINO ", finalizacion)
+					 arrayRemates = nil
+					 CloseRacing(idCarrera)
+				}
+
 			} else if a.MatrixCol == 2 && a.Monto != -1 {
 				fmt.Println("TERCERA CASILLA FULL se guarda a MatrixRemates")
 				client := &Client{}
@@ -251,7 +273,15 @@ func (c *Clientmodel) Read() {
 				}
 
 				temp.DecreaseCoins(float64(a.Monto))
-				CreateRemates(109, a.idCaballo, a.Seudonimo, a.Monto)
+				CreateRemates(idCarrera, a.idCaballo, a.Seudonimo, a.Monto)
+
+				fmt.Println("FINALIZO ", finalizacion)
+				if finalizacion == "finalizo" {
+					fmt.Println("TERMINO ", finalizacion)
+					 arrayRemates = nil
+					 CloseRacing(idCarrera)
+				}
+
 			}
 			// }
 		}
@@ -269,6 +299,11 @@ func (c *Clientmodel) Read() {
 			arrayRemates = append(arrayRemates, a)
 		}
 
+			if finalizacion == "finalizo" {
+					
+					 arrayRemates = nil
+					
+				}
 		fmt.Println("arrayRemates:", arrayRemates)
 
 		myInt8 = 15

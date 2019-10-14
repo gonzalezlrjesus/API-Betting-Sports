@@ -67,6 +67,26 @@ func UpdateRacingModel(Arrayracing []Racing, idEvent uint) map[string]interface{
 
 }
 
+// CloseRacing in DB
+func CloseRacing(idRacing string) map[string]interface{} {
+
+		temp := &Racing{}
+		err := GetDB().Table("racings").Where("id = ?", idRacing).First(temp).Error
+		if err == gorm.ErrRecordNotFound {
+			fmt.Println(err)
+			return nil
+		}
+		temp.Stateracing = "CLOSED"
+
+		err = GetDB().Save(&temp).Error
+		fmt.Println("err:, ", err)
+
+	response := u.Message(true, "Racings has become to closed")
+	return response
+
+}
+
+
 // GetOneRacing Racing
 // func GetOneRacing(idEvent, idRacing *string) map[string]interface{} {
 func GetOneRacing(idRacing *string) map[string]interface{} {
@@ -75,6 +95,21 @@ func GetOneRacing(idRacing *string) map[string]interface{} {
 	//check racing specific in DB
 	// err := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, *idEvent).First(temp).Error
 	err := GetDB().Table("racings").Where("id= ?", *idRacing).First(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println("Racing : ", err)
+		return u.Message(true, "Racing no exist")
+	}
+
+	response := u.Message(true, "Get Racing")
+	response["racing"] = temp
+	return response
+}
+
+func FindRacingWithinEvent(idEvent *string, idRacing *string) map[string]interface{} {
+    temp := &Racing{}
+
+	//check racing specific in DB
+	err := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, *idEvent).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("Racing : ", err)
 		return u.Message(true, "Racing no exist")
