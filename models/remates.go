@@ -2,7 +2,7 @@ package models
 
 import (
 	u "API-Betting-Sports/utils"
-
+"fmt"
 	"github.com/jinzhu/gorm"
 )
 
@@ -13,11 +13,12 @@ type Remates struct {
 	Idhorse   int    `json:"idhorse"`
 	Seudonimo string `json:"seudonimo"`
 	Amount    int64  `json:"amount"`
+	Horsename string  `json:"horsename"`
 }
 
 // CreateRemates Remates db
-func CreateRemates(idracing string, idhorse int, seudonimo string, amount int64) map[string]interface{} {
-	remateGanador := &Remates{Idracing: idracing, Idhorse: idhorse, Seudonimo: seudonimo, Amount: amount}
+func CreateRemates(idracing string, idhorse int, seudonimo string, amount int64, horsename string) map[string]interface{} {
+	remateGanador := &Remates{Idracing: idracing, Idhorse: idhorse, Seudonimo: seudonimo, Amount: amount, Horsename: horsename}
 
 	GetDB().Create(remateGanador)
 
@@ -28,11 +29,22 @@ func CreateRemates(idracing string, idhorse int, seudonimo string, amount int64)
 
 // GetRemates Remates db
 func GetRemates(idracing *string) map[string]interface{} {
-	// remateGanador := &Remates{Idracing: idracing}
 
-	// GetDB().Create(remateGanador)
+	remates := make([]*Remates, 0)
 
-	response := u.Message(true, "Remate added")
-	// response["remate"] = remateGanador
+	err := GetDB().Table("remates").Where("idracing = ?", *idracing).Find(&remates).Error
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	fmt.Println(err)
+	fmt.Println(remates)
+	if len(remates) > 0 {
+		response := u.Message(true, "Remates added")
+		response["remates"] = remates
+		return response
+	}
+	response := u.Message(true, "EMPTY")
 	return response
 }
+

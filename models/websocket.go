@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-	"reflect"
+
 	"github.com/gorilla/websocket"
 	"github.com/jinzhu/gorm"
 )
@@ -42,6 +42,7 @@ type MatrixRemates struct {
 	MatrixCol int
 	Seudonimo string
 	idCaballo int
+	Horsename string
 }
 
 // Manager export to controller
@@ -57,10 +58,6 @@ var arrayRemates []MatrixRemates
 var actualPosition MatrixRemates
 var idCarrera string
 var finalizacion string
-// Debo hallar una forma de almacenar todos los eventos que han transcurrido
-// para que cuando ingrese un cliente se le refleje todo lo que ha ocurrido
-// y tener la row y col actual osea que el size de la matrix debe ser
-// extraido de conectar esta parte de websocket con la bdd y model de racing and horse
 
 // Start export func
 func (manager *ClientManager) Start() {
@@ -68,10 +65,6 @@ func (manager *ClientManager) Start() {
 	for {
 		select {
 		case conn := <-manager.Register:
-
-			// if len(manager.clients) > 0 {
-
-			// }
 
 			manager.clients[conn] = true
 			jsonMessage, _ := json.Marshal(&Message{Sender: "NewConnection", Content: "/A socket NEW.", Matrix: arrayRemates, Actualposition: actualPosition})
@@ -96,15 +89,6 @@ func (manager *ClientManager) Start() {
 				}
 			}
 		case <-time.After(1 * time.Second):
-
-			// Creo que el countdown deberia empezar a correr cuando
-			// el tiempo de remate coincida con la hora transcurriendo
-			// sin importar si hay cliente o no
-			// de la forma como esta actualmente si nungun cliente ingresa al
-			//  remate jamas va a comenzar a o terminar el remate
-			// osea el remate deberia comenzar haya o no cliente conectado
-			// tambien implica que debo conectarlo con el resto de el backedn
-			// para extraer todo estos datos
 
 			if len(manager.clients) == 0 {
 				myInt8 = 15
@@ -161,7 +145,6 @@ func (c *Clientmodel) Read() {
 		jsonMessage, _ := json.Marshal(&Message{Sender: c.Id, Content: string(message)})
 		var parsedData map[string]interface{}
 		json.Unmarshal(jsonMessage, &parsedData)
-		// fmt.Println("Resulting parsedData : ", parsedData["content"])
 
 		jsonMessage2, _ := json.Marshal(parsedData["content"])
 		s, _ := strconv.Unquote(string(jsonMessage2))
@@ -169,10 +152,6 @@ func (c *Clientmodel) Read() {
 		errjson := json.Unmarshal([]byte(s), &parsedData2)
 		fmt.Println("errjson: *** ", errjson)
 
-		// TEST *********
-		fmt.Println("parsedData2: ", parsedData2)
-		fmt.Println("parsedData2[idcarrera]: ", reflect.TypeOf(parsedData2["idcarrera"]))
-		fmt.Println("parsedData2[finalizo]: ", reflect.TypeOf(parsedData2["finalizo"]))
 		idCarrera = parsedData2["idcarrera"].(string)
 		finalizacion = parsedData2["finalizo"].(string)
 
@@ -180,48 +159,49 @@ func (c *Clientmodel) Read() {
 		matrixRowfloat64 := int(parsedData2["matrixRow"].(float64))
 		matrixColfloat64 := int(parsedData2["matrixCol"].(float64))
 		seudonimoActual := parsedData2["seudonimo"].(string)
+		HorsenameActual := parsedData2["horsename"].(string)
 		idhorse := int(parsedData2["idcaballo"].(float64))
 
-		var a MatrixRemates // a == Student{"", 0}
+		var a MatrixRemates //
 		a.Monto = matrixfloat64
 		a.MatrixRow = matrixRowfloat64
 		a.MatrixCol = matrixColfloat64
 		a.Seudonimo = seudonimoActual
 		a.idCaballo = idhorse
+		a.Horsename = HorsenameActual
 
-		var respaldoActual MatrixRemates // a == Student{"", 0}
+		var respaldoActual MatrixRemates //
 		respaldoActual.Monto = actualPosition.Monto
 		respaldoActual.MatrixRow = actualPosition.MatrixRow
 		respaldoActual.MatrixCol = actualPosition.MatrixCol
 		respaldoActual.Seudonimo = actualPosition.Seudonimo
+		respaldoActual.Horsename = actualPosition.Horsename
 		respaldoActual.idCaballo = actualPosition.idCaballo
 
 		actualPosition.Monto = a.Monto
 		actualPosition.MatrixRow = int(parsedData2["matrixRowSiguiente"].(float64))
 		actualPosition.MatrixCol = int(parsedData2["matrixColSiguiente"].(float64))
 		actualPosition.Seudonimo = a.Seudonimo
+		actualPosition.Horsename = a.Horsename
 		actualPosition.idCaballo = a.idCaballo
 
-		// actualPosition.MatrixCol = int(parsedData2["matrixColSiguiente"].(float64))
-		fmt.Println("actualPosition BEFORE ---", actualPosition)
-		fmt.Println("          a MatrixRemates BEFORE ---", a)
-		fmt.Println("                                     respaldoActual BEFORE ---", respaldoActual)
-		// TEST Reducir cantidad de coins si se termina la seccion del remate del caballo
-		// osea si la siguiente row es porque termino de rematar el caballo
+		// fmt.Println("actualPosition BEFORE ---", actualPosition)
+		// fmt.Println("          a MatrixRemates BEFORE ---", a)
+		// fmt.Println("                                     respaldoActual BEFORE ---", respaldoActual)
 
 		if respaldoActual != actualPosition {
 			if a.Seudonimo == "CASA" {
-				fmt.Println("CASA se guarda a A")
-				CreateRemates(idCarrera, a.idCaballo, a.Seudonimo, a.Monto)
-			fmt.Println("FINALIZO ", finalizacion)
-								if finalizacion == "finalizo" {
-									fmt.Println("FINALIZO ", finalizacion)
-					 arrayRemates = nil
-					 CloseRacing(idCarrera)
+
+				CreateRemates(idCarrera, a.idCaballo, a.Seudonimo, a.Monto, a.Horsename)
+
+				if finalizacion == "finalizo" {
+					fmt.Println("TERMINO ", finalizacion)
+					arrayRemates = nil
+					CloseRacing(idCarrera)
 				}
 
 			} else if a.Seudonimo == "vacio" {
-				fmt.Println("vacio se guarda a actual")
+
 				client := &Client{}
 				err := GetDB().Table("clients").Where("seudonimo = ?", respaldoActual.Seudonimo).First(client).Error
 				if err != nil {
@@ -231,7 +211,7 @@ func (c *Clientmodel) Read() {
 					}
 
 				}
-				fmt.Println("client get", client)
+
 				temp := &Coins{Clientidentificationcard: client.Identificationcard}
 
 				//check client_Coins in DB
@@ -242,17 +222,16 @@ func (c *Clientmodel) Read() {
 				}
 
 				temp.DecreaseCoins(float64(respaldoActual.Monto))
-				CreateRemates(idCarrera, respaldoActual.idCaballo, respaldoActual.Seudonimo, respaldoActual.Monto)
+				CreateRemates(idCarrera, respaldoActual.idCaballo, respaldoActual.Seudonimo, respaldoActual.Monto, respaldoActual.Horsename)
 
-								fmt.Println("FINALIZO ", finalizacion)
-								if finalizacion == "finalizo" {
-									fmt.Println("TERMINO ", finalizacion)
-					 arrayRemates = nil
-					 CloseRacing(idCarrera)
+				if finalizacion == "finalizo" {
+
+					arrayRemates = nil
+					CloseRacing(idCarrera)
 				}
 
 			} else if a.MatrixCol == 2 && a.Monto != -1 {
-				fmt.Println("TERCERA CASILLA FULL se guarda a MatrixRemates")
+
 				client := &Client{}
 				err := GetDB().Table("clients").Where("seudonimo = ?", a.Seudonimo).First(client).Error
 				if err != nil {
@@ -262,7 +241,7 @@ func (c *Clientmodel) Read() {
 					}
 
 				}
-				fmt.Println("client get", client)
+
 				temp := &Coins{Clientidentificationcard: client.Identificationcard}
 
 				//check client_Coins in DB
@@ -273,38 +252,27 @@ func (c *Clientmodel) Read() {
 				}
 
 				temp.DecreaseCoins(float64(a.Monto))
-				CreateRemates(idCarrera, a.idCaballo, a.Seudonimo, a.Monto)
+				CreateRemates(idCarrera, a.idCaballo, a.Seudonimo, a.Monto, a.Horsename)
 
-				fmt.Println("FINALIZO ", finalizacion)
 				if finalizacion == "finalizo" {
-					fmt.Println("TERMINO ", finalizacion)
-					 arrayRemates = nil
-					 CloseRacing(idCarrera)
+
+					arrayRemates = nil
+					CloseRacing(idCarrera)
 				}
 
 			}
-			// }
+
 		}
-
-		// actualPosition.MatrixRow = int(parsedData2["matrixRowSiguiente"].(float64))
-
-		// actualPosition.Monto = a.Monto
-		// actualPosition.MatrixRow = int(parsedData2["matrixRowSiguiente"].(float64))
-		// actualPosition.MatrixCol = int(parsedData2["matrixColSiguiente"].(float64))
-		// actualPosition.Seudonimo = a.Seudonimo
-		// actualPosition.idCaballo = a.idCaballo
-		// fmt.Println("actualPosition AFTER ---: ", actualPosition)
 
 		if a.Monto != -1 {
 			arrayRemates = append(arrayRemates, a)
 		}
 
-			if finalizacion == "finalizo" {
-					
-					 arrayRemates = nil
-					
-				}
-		fmt.Println("arrayRemates:", arrayRemates)
+		if finalizacion == "finalizo" {
+
+			arrayRemates = nil
+
+		}
 
 		myInt8 = 15
 		Manager.broadcast <- jsonMessage

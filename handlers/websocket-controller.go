@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"API-Betting-Sports/models"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -19,7 +18,6 @@ func WsPage(res http.ResponseWriter, req *http.Request) {
 	}
 
 	client := &models.Clientmodel{Id: uuid.Must(uuid.NewV4()).String(), Socket: conn, Send: make(chan []byte)}
-	fmt.Println("client : ", client)
 	models.Manager.Register <- client
 
 	go client.Read()

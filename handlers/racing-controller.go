@@ -13,13 +13,15 @@ import (
 // CreateRacing Racing
 var CreateRacing = func(w http.ResponseWriter, r *http.Request) {
 	newsList := make([]models.Racing, 0)
+	vars := mux.Vars(r)
+	idEvent := vars["idEvent"]
+
 	err := json.NewDecoder(r.Body).Decode(&newsList)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Error while decoding request body"))
 		return
 	}
-	vars := mux.Vars(r)
-	idEvent := vars["idEvent"]
+
 	tempUint64, _ := strconv.ParseUint(idEvent, 10, 32)
 	resp := models.CreateRacingModel(newsList, uint(tempUint64))
 	u.Respond(w, resp)
@@ -69,10 +71,8 @@ var GetRacingsFor = func(w http.ResponseWriter, r *http.Request) {
 // GetSpecificRacing find and show Racing
 var GetSpecificRacing = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	// idEvent := vars["idEvent"]
 	idRacing := vars["idRacing"]
 
-	// data := models.GetOneRacing(&idEvent, &idRacing)
 	data := models.GetOneRacing(&idRacing)
 	resp := u.Message(true, "GetSpecificRacing Success")
 	resp["data"] = data
@@ -85,7 +85,6 @@ var GetSpecificRacingWithEvent = func(w http.ResponseWriter, r *http.Request) {
 	idEvent := vars["idEvent"]
 	idRacing := vars["idRacing"]
 
-	// data := models.GetOneRacing(&idEvent, &idRacing)
 	data := models.FindRacingWithinEvent(&idEvent, &idRacing)
 	resp := u.Message(true, "GetSpecificRacing Success")
 	resp["data"] = data

@@ -36,7 +36,7 @@ var AuthenticateClient = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := models.LoginClient(client.Seudonimo)
+	resp := models.LoginClient(client.Seudonimo, client.Identificationcard)
 	u.Respond(w, resp)
 }
 

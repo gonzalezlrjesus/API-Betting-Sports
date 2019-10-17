@@ -49,14 +49,14 @@ func (client *Client) CreateClient() map[string]interface{} {
 }
 
 // LoginClient function user
-func LoginClient(seudonimo string) map[string]interface{} {
-	// fmt.Println("Seudonimo Model:", seudonimo)
+func LoginClient(seudonimo string, identificationcard string) map[string]interface{} {
+
 	client := &Client{}
-	err := GetDB().Table("clients").Where("seudonimo = ?", seudonimo).First(client).Error
+	err := GetDB().Table("clients").Where("identificationcard = ? AND seudonimo = ?", identificationcard, seudonimo).First(client).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			fmt.Println("err:", err)
-			return u.Message(false, "seudonimo not found")
+			return u.Message(false, "seudonimo not found or not identificationcard")
 		}
 		return u.Message(false, "Connection error. Please retry")
 	}
@@ -66,7 +66,7 @@ func LoginClient(seudonimo string) map[string]interface{} {
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	tokenString, err := token.SignedString([]byte(os.Getenv("token_password")))
 	if err != nil {
-		// fmt.Println("sas", err)
+
 	}
 	client.Token = tokenString //Store the token in the response
 
