@@ -117,6 +117,7 @@ func FindRacingWithinEvent(idEvent *string, idRacing *string) map[string]interfa
 
 	response := u.Message(true, "Get Racing")
 	response["racing"] = temp
+	response["time"] = time.Now()
 	return response
 }
 
