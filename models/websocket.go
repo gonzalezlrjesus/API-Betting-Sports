@@ -152,6 +152,8 @@ func (c *Clientmodel) Read() {
 		errjson := json.Unmarshal([]byte(s), &parsedData2)
 		fmt.Println("errjson: *** ", errjson)
 
+		fmt.Println("idCarrera: *** ", idCarrera)
+		fmt.Println("parsedData2 idCarrera: *** ",  parsedData2["idcarrera"].(string))
 		idCarrera = parsedData2["idcarrera"].(string)
 		finalizacion = parsedData2["finalizo"].(string)
 
