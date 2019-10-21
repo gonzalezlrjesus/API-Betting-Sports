@@ -3,6 +3,10 @@ package models
 import (
 	u "API-Betting-Sports/utils"
 	"fmt"
+	"math"
+	"strconv"
+
+	// "reflect"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -69,23 +73,57 @@ func UpdateRacingModel(Arrayracing []Racing, idEvent uint) map[string]interface{
 
 // CloseRacing in DB
 func CloseRacing(idRacing string) map[string]interface{} {
+	tempUint64, _ := strconv.ParseUint(idRacing, 10, 32)
 
-		temp := &Racing{}
-		err := GetDB().Table("racings").Where("id = ?", idRacing).First(temp).Error
-		if err == gorm.ErrRecordNotFound {
-			fmt.Println(err)
-			return nil
-		}
-		temp.Stateracing = "CLOSED"
+	temp := &Racing{}
+	err := GetDB().Table("racings").Where("id = ?", uint(tempUint64)).First(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println(err)
+		return nil
+	}
+	temp.Stateracing = "CLOSED"
 
-		err = GetDB().Save(&temp).Error
-		fmt.Println("err:, ", err)
+	err = GetDB().Save(&temp).Error
+	fmt.Println("err:, ", err)
 
 	response := u.Message(true, "Racings has become to closed")
 	return response
 
 }
 
+// TimeisEqualStartTime in DB
+func TimeisEqualStartTime(idRacing string) bool {
+	tempUint64, _ := strconv.ParseUint(idRacing, 10, 32)
+	// fmt.Println("TimeisEqualStartTime id", tempUint64)
+	temp := &Racing{}
+	err := GetDB().Table("racings").Where("id = ?", uint(tempUint64)).First(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println(err)
+		return false
+	}
+	hs := temp.Starttime.Sub(time.Now()).Hours()
+
+	hs, mf := math.Modf(hs)
+	ms := mf * 60
+
+	ms, sf := math.Modf(ms)
+	ss := sf * 60
+
+	// fmt.Println(hs, "hours", ms, "minutes", int(ss), "seconds")
+	// fmt.Println(ms == 0, "minutes == 0")
+	// fmt.Println(int(ss) == 0, "ss == 0")
+
+	response := false
+	if ms == 0 && int(ss) == 0 {
+		temp.Stateracing = "CLOSED"
+
+		err = GetDB().Save(&temp).Error
+		response := true
+		return response
+	}
+	return response
+
+}
 
 // GetOneRacing Racing
 // func GetOneRacing(idEvent, idRacing *string) map[string]interface{} {
@@ -105,8 +143,9 @@ func GetOneRacing(idRacing *string) map[string]interface{} {
 	return response
 }
 
+// FindRacingWithinEvent find
 func FindRacingWithinEvent(idEvent *string, idRacing *string) map[string]interface{} {
-    temp := &Racing{}
+	temp := &Racing{}
 
 	//check racing specific in DB
 	err := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, *idEvent).First(temp).Error
@@ -183,7 +222,7 @@ func DeleteRacings(idComponent uint) bool {
 		fmt.Println("Racingcomponentid  : ", err)
 		return false
 	}
-		fmt.Println("Error  : ", err)
+	fmt.Println("Error  : ", err)
 	for _, JustRace := range *racings {
 		// DeleteRacingComponents(JustRace.ID)
 		DeleteAllHorses(JustRace.ID)

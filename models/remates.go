@@ -2,18 +2,19 @@ package models
 
 import (
 	u "API-Betting-Sports/utils"
-"fmt"
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 )
 
 // Remates struct
 type Remates struct {
 	gorm.Model
-	Idracing  string   `json:"idracing"`
+	Idracing  string `json:"idracing"`
 	Idhorse   int    `json:"idhorse"`
 	Seudonimo string `json:"seudonimo"`
 	Amount    int64  `json:"amount"`
-	Horsename string  `json:"horsename"`
+	Horsename string `json:"horsename"`
 }
 
 // CreateRemates Remates db
@@ -37,8 +38,7 @@ func GetRemates(idracing *string) map[string]interface{} {
 		fmt.Println(err)
 		return nil
 	}
-	fmt.Println(err)
-	fmt.Println(remates)
+
 	if len(remates) > 0 {
 		response := u.Message(true, "Remates added")
 		response["remates"] = remates
@@ -47,4 +47,3 @@ func GetRemates(idracing *string) map[string]interface{} {
 	response := u.Message(true, "EMPTY")
 	return response
 }
-

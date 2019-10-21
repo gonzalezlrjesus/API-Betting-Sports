@@ -90,6 +90,16 @@ func (manager *ClientManager) Start() {
 			}
 		case <-time.After(1 * time.Second):
 
+			if idCarrera != "" {
+				// fmt.Println("IF ENTRO", reflect.TypeOf(idCarrera))
+				if TimeisEqualStartTime(idCarrera) {
+					// fmt.Println("APROBADO CERRADO", reflect.TypeOf(idCarrera))
+					arrayRemates = nil
+					myInt8 = 16
+					idCarrera = ""
+				}
+			}
+
 			if len(manager.clients) == 0 {
 				myInt8 = 15
 				// arrayRemates = nil
@@ -152,8 +162,6 @@ func (c *Clientmodel) Read() {
 		errjson := json.Unmarshal([]byte(s), &parsedData2)
 		fmt.Println("errjson: *** ", errjson)
 
-		fmt.Println("idCarrera: *** ", idCarrera)
-		fmt.Println("parsedData2 idCarrera: *** ",  parsedData2["idcarrera"].(string))
 		idCarrera = parsedData2["idcarrera"].(string)
 		finalizacion = parsedData2["finalizo"].(string)
 
@@ -200,6 +208,7 @@ func (c *Clientmodel) Read() {
 					fmt.Println("TERMINO ", finalizacion)
 					arrayRemates = nil
 					CloseRacing(idCarrera)
+					idCarrera = ""
 				}
 
 			} else if a.Seudonimo == "vacio" {
@@ -230,6 +239,7 @@ func (c *Clientmodel) Read() {
 
 					arrayRemates = nil
 					CloseRacing(idCarrera)
+					idCarrera = ""
 				}
 
 			} else if a.MatrixCol == 2 && a.Monto != -1 {
@@ -257,9 +267,9 @@ func (c *Clientmodel) Read() {
 				CreateRemates(idCarrera, a.idCaballo, a.Seudonimo, a.Monto, a.Horsename)
 
 				if finalizacion == "finalizo" {
-
 					arrayRemates = nil
 					CloseRacing(idCarrera)
+					idCarrera = ""
 				}
 
 			}
@@ -271,9 +281,8 @@ func (c *Clientmodel) Read() {
 		}
 
 		if finalizacion == "finalizo" {
-
 			arrayRemates = nil
-
+			idCarrera = ""
 		}
 
 		myInt8 = 15
