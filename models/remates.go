@@ -10,16 +10,17 @@ import (
 // Remates struct
 type Remates struct {
 	gorm.Model
-	Idracing  string `json:"idracing"`
-	Idhorse   int    `json:"idhorse"`
-	Seudonimo string `json:"seudonimo"`
-	Amount    int64  `json:"amount"`
-	Horsename string `json:"horsename"`
+	Idracing  	string 	`json:"idracing"`
+	Idhorse   	int    	`json:"idhorse"`
+	Numberhorse int  	`json:"numberhorse"`
+	Seudonimo 	string 	`json:"seudonimo"`
+	Amount    	int64  	`json:"amount"`
+	Horsename 	string 	`json:"horsename"`
 }
 
 // CreateRemates Remates db
-func CreateRemates(idracing string, idhorse int, seudonimo string, amount int64, horsename string) map[string]interface{} {
-	remateGanador := &Remates{Idracing: idracing, Idhorse: idhorse, Seudonimo: seudonimo, Amount: amount, Horsename: horsename}
+func CreateRemates(idracing string, idhorse int, numberhorse int, seudonimo string, amount int64, horsename string) map[string]interface{} {
+	remateGanador := &Remates{Idracing: idracing, Idhorse: idhorse, Numberhorse: numberhorse ,Seudonimo: seudonimo, Amount: amount, Horsename: horsename}
 
 	GetDB().Create(remateGanador)
 

@@ -37,12 +37,12 @@ type Message struct {
 
 // MatrixRemates model MatrixRemates
 type MatrixRemates struct {
-	Monto     int64
-	MatrixRow int
-	MatrixCol int
-	Seudonimo string
-	idCaballo int
-	Horsename string
+	Monto         int64
+	MatrixRow     int
+	NumeroCaballo int
+	Seudonimo     string
+	idCaballo     int
+	Horsename     string
 }
 
 // Manager export to controller
@@ -167,7 +167,7 @@ func (c *Clientmodel) Read() {
 
 		matrixfloat64 := int64(parsedData2["matrix"].(float64))
 		matrixRowfloat64 := int(parsedData2["matrixRow"].(float64))
-		matrixColfloat64 := int(parsedData2["matrixCol"].(float64))
+		numeroCaballofloat64 := int(parsedData2["numerocaballo"].(float64))
 		seudonimoActual := parsedData2["seudonimo"].(string)
 		HorsenameActual := parsedData2["horsename"].(string)
 		idhorse := int(parsedData2["idcaballo"].(float64))
@@ -175,7 +175,7 @@ func (c *Clientmodel) Read() {
 		var a MatrixRemates //
 		a.Monto = matrixfloat64
 		a.MatrixRow = matrixRowfloat64
-		a.MatrixCol = matrixColfloat64
+		a.NumeroCaballo = numeroCaballofloat64
 		a.Seudonimo = seudonimoActual
 		a.idCaballo = idhorse
 		a.Horsename = HorsenameActual
@@ -183,14 +183,14 @@ func (c *Clientmodel) Read() {
 		var respaldoActual MatrixRemates //
 		respaldoActual.Monto = actualPosition.Monto
 		respaldoActual.MatrixRow = actualPosition.MatrixRow
-		respaldoActual.MatrixCol = actualPosition.MatrixCol
+		respaldoActual.NumeroCaballo = actualPosition.NumeroCaballo
 		respaldoActual.Seudonimo = actualPosition.Seudonimo
 		respaldoActual.Horsename = actualPosition.Horsename
 		respaldoActual.idCaballo = actualPosition.idCaballo
 
 		actualPosition.Monto = a.Monto
 		actualPosition.MatrixRow = int(parsedData2["matrixRowSiguiente"].(float64))
-		actualPosition.MatrixCol = int(parsedData2["matrixColSiguiente"].(float64))
+		actualPosition.NumeroCaballo = a.NumeroCaballo
 		actualPosition.Seudonimo = a.Seudonimo
 		actualPosition.Horsename = a.Horsename
 		actualPosition.idCaballo = a.idCaballo
@@ -202,10 +202,9 @@ func (c *Clientmodel) Read() {
 		if respaldoActual != actualPosition {
 			if a.Seudonimo == "CASA" {
 
-				CreateRemates(idCarrera, a.idCaballo, a.Seudonimo, a.Monto, a.Horsename)
+				CreateRemates(idCarrera, a.idCaballo, a.NumeroCaballo, a.Seudonimo, a.Monto, a.Horsename)
 
 				if finalizacion == "finalizo" {
-					fmt.Println("TERMINO ", finalizacion)
 					arrayRemates = nil
 					CloseRacing(idCarrera)
 					idCarrera = ""
@@ -233,40 +232,10 @@ func (c *Clientmodel) Read() {
 				}
 
 				temp.DecreaseCoins(float64(respaldoActual.Monto))
-				CreateRemates(idCarrera, respaldoActual.idCaballo, respaldoActual.Seudonimo, respaldoActual.Monto, respaldoActual.Horsename)
+				CreateRemates(idCarrera, respaldoActual.idCaballo, respaldoActual.NumeroCaballo, respaldoActual.Seudonimo, respaldoActual.Monto, respaldoActual.Horsename)
 
 				if finalizacion == "finalizo" {
 
-					arrayRemates = nil
-					CloseRacing(idCarrera)
-					idCarrera = ""
-				}
-
-			} else if a.MatrixCol == 2 && a.Monto != -1 {
-
-				client := &Client{}
-				err := GetDB().Table("clients").Where("seudonimo = ?", a.Seudonimo).First(client).Error
-				if err != nil {
-					if err == gorm.ErrRecordNotFound {
-						fmt.Println("err not found seudonimo websocket:", err)
-
-					}
-
-				}
-
-				temp := &Coins{Clientidentificationcard: client.Identificationcard}
-
-				//check client_Coins in DB
-				errCoins := GetDB().Table("coins").Where("ClientIdentificationcard = ?", temp.Clientidentificationcard).First(temp).Error
-				if errCoins == gorm.ErrRecordNotFound {
-					fmt.Println("Client Coins not found ClientIdentificationcard websocket: ", errCoins)
-
-				}
-
-				temp.DecreaseCoins(float64(a.Monto))
-				CreateRemates(idCarrera, a.idCaballo, a.Seudonimo, a.Monto, a.Horsename)
-
-				if finalizacion == "finalizo" {
 					arrayRemates = nil
 					CloseRacing(idCarrera)
 					idCarrera = ""
@@ -282,9 +251,10 @@ func (c *Clientmodel) Read() {
 
 		if finalizacion == "finalizo" {
 			arrayRemates = nil
-			idCarrera = ""
+			// idCarrera = ""
 		}
 
+		// fmt.Println("arrayRemates ", arrayRemates)
 		myInt8 = 15
 		Manager.broadcast <- jsonMessage
 	}
