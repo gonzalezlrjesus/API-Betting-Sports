@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"math"
 	"strconv"
-
 	// "reflect"
 	"time"
-
 	"github.com/jinzhu/gorm"
 )
 
@@ -132,7 +130,7 @@ func GetOneRacing(idRacing *string) map[string]interface{} {
 
 	//check racing specific in DB
 	// err := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, *idEvent).First(temp).Error
-	err := GetDB().Table("racings").Where("id= ?", *idRacing).First(temp).Error
+	err := GetDB().Table("racings").Where("id = ?", *idRacing).First(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("Racing : ", err)
 		return u.Message(true, "Racing no exist")

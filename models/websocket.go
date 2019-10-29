@@ -58,6 +58,7 @@ var arrayRemates []MatrixRemates
 var actualPosition MatrixRemates
 var idCarrera string
 var finalizacion string
+var montoTotal int64
 
 // Start export func
 func (manager *ClientManager) Start() {
@@ -203,8 +204,10 @@ func (c *Clientmodel) Read() {
 			if a.Seudonimo == "CASA" {
 
 				CreateRemates(idCarrera, a.idCaballo, a.NumeroCaballo, a.Seudonimo, a.Monto, a.Horsename)
-
+				montoTotal = montoTotal + a.Monto
 				if finalizacion == "finalizo" {
+					fmt.Println("Monto finalizo:", montoTotal)
+					CreateTablas(idCarrera, montoTotal)
 					arrayRemates = nil
 					CloseRacing(idCarrera)
 					idCarrera = ""
@@ -233,9 +236,10 @@ func (c *Clientmodel) Read() {
 
 				temp.DecreaseCoins(float64(respaldoActual.Monto))
 				CreateRemates(idCarrera, respaldoActual.idCaballo, respaldoActual.NumeroCaballo, respaldoActual.Seudonimo, respaldoActual.Monto, respaldoActual.Horsename)
-
+				montoTotal = montoTotal + respaldoActual.Monto
 				if finalizacion == "finalizo" {
-
+					fmt.Println("Monto finalizo:", montoTotal)
+					CreateTablas(idCarrera, montoTotal)
 					arrayRemates = nil
 					CloseRacing(idCarrera)
 					idCarrera = ""

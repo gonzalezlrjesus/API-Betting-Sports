@@ -7,6 +7,9 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Cuando el proyecto este mas avanzado deberia llevar un control de la tabla que se esta jugando
+// Todo eso para repartir el dinero mas eficazmente cuando existan varias tablas para la misma carrera
+// Necesito tener un control a cual tabla pertenece el remate para repartir el dineros
 // Remates struct
 type Remates struct {
 	gorm.Model

@@ -11,14 +11,14 @@ import (
 // Event struct
 type Event struct {
 	gorm.Model
-	Dateevent           time.Time 	`json:"dateevent"`
-	Hipodromo      		string 		`json:"hipodromo"`
-	Racingnumbers 		uint 		`json:"racingnumbers"`
-	Minimumamount   	uint   		`json:"minimumamount"`
-	Profitpercentage 	uint 		`json:"profitpercentage"`
-	Auctionnumber 		uint 		`json:"auctionnumber"`
-	TimebetweenAuctions uint 		`json:"timebetweenAuctions"`
-	Horsenotauction 	string 		`json:"horsenotauction"`
+	Dateevent           time.Time `json:"dateevent"`
+	Hipodromo           string    `json:"hipodromo"`
+	Racingnumbers       uint      `json:"racingnumbers"`
+	Minimumamount       uint      `json:"minimumamount"`
+	Profitpercentage    uint      `json:"profitpercentage"`
+	Auctionnumber       uint      `json:"auctionnumber"`
+	TimebetweenAuctions uint      `json:"timebetweenAuctions"`
+	Horsenotauction     string    `json:"horsenotauction"`
 }
 
 // CreateEvent Event db
@@ -28,9 +28,9 @@ func (event *Event) CreateEvent() map[string]interface{} {
 		return resp
 	}
 
-    event.Auctionnumber = 3
-    event.TimebetweenAuctions = 5
-    event.Horsenotauction = "casa"
+	event.Auctionnumber = 3
+	event.TimebetweenAuctions = 5
+	event.Horsenotauction = "casa"
 	GetDB().Create(event)
 
 	response := u.Message(true, "Event add to system")
@@ -82,8 +82,24 @@ func GetOneEvent(idEvent *string) map[string]interface{} {
 	return response
 }
 
+// GetOneEventMonto event
+func GetOneEventMonto(idEvent uint) map[string]interface{} {
+	temp := &Event{}
+
+	//check event specific in DB
+	err := GetDB().Table("events").Where("id = ?", idEvent).First(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println("Event : ", err)
+		return u.Message(true, "Event no exist")
+	}
+
+	response := u.Message(true, "Get Event")
+	response["event"] = temp
+	return response
+}
+
 // GetEvents all events of table events
-func GetEvents()  map[string]interface{} {
+func GetEvents() map[string]interface{} {
 
 	events := make([]*Event, 0)
 
