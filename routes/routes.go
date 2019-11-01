@@ -87,6 +87,9 @@ func Routes() *mux.Router {
 	// Add a auction number
 	router.HandleFunc("/api/admin/components/{idComponent}/auctionnumber", handlers.AddAuctionNumber).Methods("POST")
 
+	// Repartir Ganancias
+	router.HandleFunc("/api/admin/{idRacing}/{idHorse}", handlers.RepartirGanancias).Methods("GET")
+
 	// Login Admin
 	router.HandleFunc("/api/admin/login", handlers.Authenticate).Methods("POST")
 

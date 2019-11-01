@@ -5,5 +5,5 @@ import (
 )
 
 func TestCreateTablas(t *testing.T) {
-	CreateTablas("513455", 10000)
+	CreateTablas("1", 10000)
 }

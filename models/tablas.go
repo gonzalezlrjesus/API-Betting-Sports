@@ -76,3 +76,12 @@ func GetTablas(idracing *string) map[string]interface{} {
 	response := u.Message(true, "EMPTY")
 	return response
 }
+
+// UpdateStateTabla tablas
+func (tabla *Tablas) UpdateStateTabla() map[string]interface{} {
+	tabla.Estado = "PAGADO"
+	GetDB().Save(&tabla)
+	response := u.Message(true, "Tabla has been updated")
+	response["tabla"] = tabla
+	return response
+}

@@ -90,3 +90,17 @@ var GetSpecificRacingWithEvent = func(w http.ResponseWriter, r *http.Request) {
 	resp["data"] = data
 	u.Respond(w, resp)
 }
+
+// RepartirGanancias repartir ganancias al ganador
+var RepartirGanancias= func(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idRacing := vars["idRacing"]
+	idHorse := vars["idHorse"]
+
+	tempUint64Horse, _ := strconv.ParseUint(idHorse, 10, 32)
+
+	data := models.RepartirGanancias(idRacing, int(tempUint64Horse))
+	resp := u.Message(true, "GetSpecificRacing Success")
+	resp["data"] = data
+	u.Respond(w, resp)
+}

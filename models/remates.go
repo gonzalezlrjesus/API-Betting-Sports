@@ -10,20 +10,21 @@ import (
 // Cuando el proyecto este mas avanzado deberia llevar un control de la tabla que se esta jugando
 // Todo eso para repartir el dinero mas eficazmente cuando existan varias tablas para la misma carrera
 // Necesito tener un control a cual tabla pertenece el remate para repartir el dineros
+
 // Remates struct
 type Remates struct {
 	gorm.Model
-	Idracing  	string 	`json:"idracing"`
-	Idhorse   	int    	`json:"idhorse"`
-	Numberhorse int  	`json:"numberhorse"`
-	Seudonimo 	string 	`json:"seudonimo"`
-	Amount    	int64  	`json:"amount"`
-	Horsename 	string 	`json:"horsename"`
+	Idracing    string `json:"idracing"`
+	Idhorse     int    `json:"idhorse"`
+	Numberhorse int    `json:"numberhorse"`
+	Seudonimo   string `json:"seudonimo"`
+	Amount      int64  `json:"amount"`
+	Horsename   string `json:"horsename"`
 }
 
 // CreateRemates Remates db
 func CreateRemates(idracing string, idhorse int, numberhorse int, seudonimo string, amount int64, horsename string) map[string]interface{} {
-	remateGanador := &Remates{Idracing: idracing, Idhorse: idhorse, Numberhorse: numberhorse ,Seudonimo: seudonimo, Amount: amount, Horsename: horsename}
+	remateGanador := &Remates{Idracing: idracing, Idhorse: idhorse, Numberhorse: numberhorse, Seudonimo: seudonimo, Amount: amount, Horsename: horsename}
 
 	GetDB().Create(remateGanador)
 

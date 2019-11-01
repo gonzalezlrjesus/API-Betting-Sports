@@ -39,6 +39,37 @@ func (deposit *Deposit) AddDepositClient() map[string]interface{} {
 	return response
 }
 
+// AddGananciaClient Client db
+func AddGananciaClient(seudonimo string, montoganado int64, formapago string, serial uint) map[string]interface{} {
+
+	//check client in DB
+	temp := &Client{}
+	err := GetDB().Table("clients").Where("seudonimo = ?", seudonimo).First(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println("Client Coins : ", err)
+		return nil
+	}
+
+	depositGanador := &Deposit {Amount: float64(montoganado), Clientidentificationcard: temp.Identificationcard, FormaPago: formapago, Serial: serial}
+
+	GetDB().Create(depositGanador)
+
+	tempCoins := &Coins{Clientidentificationcard: depositGanador.Clientidentificationcard}
+
+	//check client_Coins in DB
+	errCoins := GetDB().Table("coins").Where("ClientIdentificationcard = ?", tempCoins.Clientidentificationcard).First(tempCoins).Error
+	if errCoins == gorm.ErrRecordNotFound {
+		fmt.Println("Client Coins : ", errCoins)
+		return nil
+	}
+
+	response := u.Message(true, "deposit has been created")
+	response["updateCoins"] = tempCoins.UpdateCoins(depositGanador.Amount)
+	response["depositGanador"] = depositGanador
+	return response
+}
+
+
 // GetAllDepositsClient Client db
 func GetAllDepositsClient(idClient *string) map[string]interface{} {
 

@@ -5,20 +5,24 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+
 	// "reflect"
 	"time"
+
 	"github.com/jinzhu/gorm"
 )
 
 // Racing struct
 type Racing struct {
 	gorm.Model
-	Eventid      uint      `json:"eventid"`
-	Starttime    time.Time `json:"starttime"`
-	Horsenumbers uint      `json:"horsenumbers"`
-	Auctiontime  time.Time `json:"auctiontime"`
-	Alerttime    time.Time `json:"alerttime"`
-	Stateracing  string    `json:"stateracing"`
+	Eventid              uint      `json:"eventid"`
+	Starttime            time.Time `json:"starttime"`
+	Horsenumbers         uint      `json:"horsenumbers"`
+	Auctiontime          time.Time `json:"auctiontime"`
+	Alerttime            time.Time `json:"alerttime"`
+	Stateracing          string    `json:"stateracing"`
+	Idcaballoganador     uint      `json:"idcaballoganador"`
+	Nombrecaballoganador string    `json:"nombrecaballoganador"`
 }
 
 // ListRacings struct test
@@ -155,6 +159,43 @@ func FindRacingWithinEvent(idEvent *string, idRacing *string) map[string]interfa
 	response := u.Message(true, "Get Racing")
 	response["racing"] = temp
 	response["time"] = time.Now()
+	return response
+}
+
+// RepartirGanancias find
+func RepartirGanancias(idRacing string, idHorse int) map[string]interface{} {
+	// REMATES
+	temp := &Remates{}
+	err := GetDB().Table("remates").Where("idracing = ? AND idhorse = ?", idRacing, idHorse).Find(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println("Remates : ", err)
+		return u.Message(true, "Remates no exist")
+	}
+
+	// TABLAS
+	tempTablas := &Tablas{}
+	errtablas := GetDB().Table("tablas").Where("idracing = ?", idRacing).Find(tempTablas).Error
+	if errtablas == gorm.ErrRecordNotFound {
+		fmt.Println("tablas : ", errtablas)
+		return u.Message(true, "tablas no exist")
+	}
+
+	AddGananciaClient(temp.Seudonimo, tempTablas.Montoganador, "Ganancia", tempTablas.ID)
+	AddGananciaClient("CASA", tempTablas.Montocasa, "CASA", tempTablas.ID)
+
+	tempTablas.UpdateStateTabla()
+
+	tempRacing := &Racing{}
+	tempUint64, _ := strconv.ParseUint(idRacing, 10, 32)
+	//check racing specific in DB
+	errRacing := GetDB().Table("racings").Where("id= ?", uint(tempUint64)).First(tempRacing).Error
+	if errRacing == gorm.ErrRecordNotFound {
+		fmt.Println("Racing : ", errRacing)
+		return u.Message(true, "Racing no exist")
+	}
+	tempRacing.Idcaballoganador = uint(idHorse)
+	GetDB().Save(&tempRacing)
+	response := u.Message(true, "Ganancias Repartidas")
 	return response
 }
 

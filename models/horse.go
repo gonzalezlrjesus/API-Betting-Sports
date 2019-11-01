@@ -14,7 +14,6 @@ type Horse struct {
 	Racingid      uint   `json:"racingid"`
 	Horsename     string `json:"horsename"`
 	Numero        uint   `json:"numero"`
-	Finalposition string `json:"finalposition"`
 }
 
 // CreateHorseModel add a new race horse array to db in the table Horse
@@ -55,7 +54,6 @@ func (horse *Horse) UpdateHorse(idRacing, idHorse *string) map[string]interface{
 	}
 
 	temp.Horsename = horse.Horsename
-	temp.Finalposition = horse.Finalposition
 
 	GetDB().Save(&temp)
 
