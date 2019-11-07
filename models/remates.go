@@ -3,7 +3,7 @@ package models
 import (
 	u "API-Betting-Sports/utils"
 	"fmt"
-
+	"time"
 	"github.com/jinzhu/gorm"
 )
 
@@ -47,8 +47,10 @@ func GetRemates(idracing *string) map[string]interface{} {
 	if len(remates) > 0 {
 		response := u.Message(true, "Remates added")
 		response["remates"] = remates
+		response["time"] = time.Now()
 		return response
 	}
 	response := u.Message(true, "EMPTY")
+	response["time"] = time.Now()
 	return response
 }

@@ -17,7 +17,7 @@ func Routes() *mux.Router {
 
 	// Create new Admin
 	router.HandleFunc("/api/admin", handlers.CreateAdmin).Methods("POST")
-	// Create new Client
+	// Create new Client from Admin APP
 	router.HandleFunc("/api/admin/clients", handlers.CreateClient).Methods("POST")
 	// Create new Event
 	router.HandleFunc("/api/admin/event", handlers.CreateEvent).Methods("POST")
@@ -58,7 +58,7 @@ func Routes() *mux.Router {
 	// To a specific Tablas Remates
 	router.HandleFunc("/api/admin/{idRacing}/tablas", handlers.GetTablas).Methods("GET")
 
-	// Update Client
+	// Update Client from Admin APP
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.UpdateClient).Methods("PUT")
 	// Update State Blocked or Enable to access Client
 	router.HandleFunc("/api/admin/clients/{idClient}/state", handlers.StateClient).Methods("PUT")
@@ -97,6 +97,8 @@ func Routes() *mux.Router {
 
 	// Login Client
 	router.HandleFunc("/api/clients/login", handlers.AuthenticateClient).Methods("POST")
+	// Create new Client from Client APP
+	router.HandleFunc("/api/admin/client/app", handlers.CreateClient).Methods("POST")
 
 	// ------------------ WEBSOCKET ----------------------------
 

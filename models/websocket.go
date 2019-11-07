@@ -96,13 +96,13 @@ func (manager *ClientManager) Start() {
 				if TimeisEqualStartTime(idCarrera) {
 					// fmt.Println("APROBADO CERRADO", reflect.TypeOf(idCarrera))
 					arrayRemates = nil
-					myInt8 = 16
+					myInt8 = 11
 					idCarrera = ""
 				}
 			}
 
 			if len(manager.clients) == 0 {
-				myInt8 = 15
+				myInt8 = 10
 				// arrayRemates = nil
 			}
 
@@ -110,7 +110,7 @@ func (manager *ClientManager) Start() {
 				myInt8 = myInt8 - 1
 
 				if myInt8 < 0 {
-					myInt8 = 15
+					myInt8 = 10
 
 				}
 
@@ -203,10 +203,31 @@ func (c *Clientmodel) Read() {
 		if respaldoActual != actualPosition {
 			if a.Seudonimo == "CASA" {
 
+				client := &Client{}
+				err := GetDB().Table("clients").Where("seudonimo = ?", a.Seudonimo).First(client).Error
+				if err != nil {
+					if err == gorm.ErrRecordNotFound {
+						fmt.Println("err not found seudonimo websocket CASA:", err)
+
+					}
+
+				}
+
+				temp := &Coins{Clientidentificationcard: client.Identificationcard}
+
+				//check client_Coins in DB
+				errCoins := GetDB().Table("coins").Where("ClientIdentificationcard = ?", temp.Clientidentificationcard).First(temp).Error
+				if errCoins == gorm.ErrRecordNotFound {
+					fmt.Println("Client Coins not found ClientIdentificationcard websocket: ", errCoins)
+
+				}
+
+				temp.DecreaseCoins(float64(a.Monto))
+
 				CreateRemates(idCarrera, a.idCaballo, a.NumeroCaballo, a.Seudonimo, a.Monto, a.Horsename)
 				montoTotal = montoTotal + a.Monto
 				if finalizacion == "finalizo" {
-					fmt.Println("Monto finalizo:", montoTotal)
+					fmt.Println("Monto finalizo CASA:", montoTotal)
 					CreateTablas(idCarrera, montoTotal)
 					arrayRemates = nil
 					CloseRacing(idCarrera)
@@ -219,7 +240,7 @@ func (c *Clientmodel) Read() {
 				err := GetDB().Table("clients").Where("seudonimo = ?", respaldoActual.Seudonimo).First(client).Error
 				if err != nil {
 					if err == gorm.ErrRecordNotFound {
-						fmt.Println("err not found seudonimo websocket:", err)
+						fmt.Println("err not found seudonimo websocket: CLIENTE ", err)
 
 					}
 
@@ -238,7 +259,7 @@ func (c *Clientmodel) Read() {
 				CreateRemates(idCarrera, respaldoActual.idCaballo, respaldoActual.NumeroCaballo, respaldoActual.Seudonimo, respaldoActual.Monto, respaldoActual.Horsename)
 				montoTotal = montoTotal + respaldoActual.Monto
 				if finalizacion == "finalizo" {
-					fmt.Println("Monto finalizo:", montoTotal)
+					fmt.Println("Monto finalizo CLIENTE:", montoTotal)
 					CreateTablas(idCarrera, montoTotal)
 					arrayRemates = nil
 					CloseRacing(idCarrera)
@@ -259,7 +280,7 @@ func (c *Clientmodel) Read() {
 		}
 
 		// fmt.Println("arrayRemates ", arrayRemates)
-		myInt8 = 15
+		myInt8 = 10
 		Manager.broadcast <- jsonMessage
 	}
 }

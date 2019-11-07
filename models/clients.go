@@ -7,6 +7,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Client struct
@@ -15,6 +16,7 @@ type Client struct {
 	Name               string `json:"name"`
 	Identificationcard string `json:"identificationcard"`
 	Seudonimo          string `json:"seudonimo"`
+	Password 		   string `json:"password"`
 	Email              string `json:"email"`
 	Phone              string `json:"phone"`
 	Banknumber         string `json:"banknumber"`
@@ -30,6 +32,9 @@ func (client *Client) CreateClient() map[string]interface{} {
 		return resp
 	}
 
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(client.Password), bcrypt.DefaultCost)
+	client.Password = string(hashedPassword)
+
 	GetDB().Create(client)
 
 	if client.ID <= 0 {
@@ -42,6 +47,8 @@ func (client *Client) CreateClient() map[string]interface{} {
 	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
 	client.Token = tokenString
 
+	client.Password = "" //delete password
+
 	response := u.Message(true, "client has been created")
 	response["Amount"] = CreateAmount(client.Identificationcard)
 	response["client"] = client
@@ -49,17 +56,24 @@ func (client *Client) CreateClient() map[string]interface{} {
 }
 
 // LoginClient function user
-func LoginClient(seudonimo string, identificationcard string) map[string]interface{} {
+func LoginClient(password string, seudonimo string) map[string]interface{} {
 
 	client := &Client{}
-	err := GetDB().Table("clients").Where("identificationcard = ? AND seudonimo = ?", identificationcard, seudonimo).First(client).Error
+	err := GetDB().Table("clients").Where("seudonimo = ? ", seudonimo).First(client).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			fmt.Println("err:", err)
+			fmt.Println("er:", err)
 			return u.Message(false, "seudonimo not found or not identificationcard")
 		}
 		return u.Message(false, "Connection error. Please retry")
 	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(client.Password), []byte(password))
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword { //Password does not match!
+		return u.Message(false, "seudonimo not found or not identificationcard")
+	}
+	//Worked! Logged In
+	client.Password = ""
 
 	//Create JWT token
 	tk := &Token{UserID: client.ID}
@@ -122,6 +136,12 @@ func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 	temp.Email = client.Email
 	temp.Name = client.Name
 	temp.Seudonimo = client.Seudonimo
+
+	if len(client.Password) > 0 { 
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(client.Password), bcrypt.DefaultCost)
+		temp.Password = string(hashedPassword)
+	}
+	
 	temp.Phone = client.Phone
 	temp.Banknumber = client.Banknumber
 	temp.Bankname = client.Bankname
@@ -204,6 +224,10 @@ func (client *Client) ValidateClient() (map[string]interface{}, bool) {
 
 	if client.Seudonimo == "" {
 		return u.Message(false, "Seudonimo is required"), false
+	}
+
+	if len(client.Password) < 6 {
+		return u.Message(false, "Password is required"), false
 	}
 
 	//check for errors and duplicate Identificationcard

@@ -13,6 +13,7 @@ var CreateAdmin = func(w http.ResponseWriter, r *http.Request) {
 
 	admin := &models.Admin{}
 	err := json.NewDecoder(r.Body).Decode(admin) //decode the request body into struct and failed if any error occur
+	
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"))
 		return
