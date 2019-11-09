@@ -253,6 +253,18 @@ func (client *Client) ValidateClient() (map[string]interface{}, bool) {
 		return u.Message(false, "Seudonimo already in use by another user."), false
 	}
 
+	tempEmail := &Client{}
+
+	//check for errors and duplicate Email
+	errEmail := GetDB().Table("clients").Where("email = ?", client.Email).First(tempEmail).Error
+	if errEmail != nil && errEmail != gorm.ErrRecordNotFound {
+		return u.Message(false, "Connection error. Please retry"), false
+	}
+
+	if tempEmail.Email != "" {
+		return u.Message(false, "Email already in use by another user."), false
+	}
+
 	return u.Message(false, "Requirement passed"), true
 }
 
@@ -296,11 +308,21 @@ func (client *Client) ValidateClientParams(idClient *string) (map[string]interfa
 		return u.Message(false, "Connection error. Please retry"), false
 	}
 
+	// Data form email
+	tempEmail := &Client{}
+	errEmail := GetDB().Table("clients").Where("email = ?", client.Email).First(tempEmail).Error
+	if errEmail != nil && errEmail != gorm.ErrRecordNotFound {
+		return u.Message(false, "Connection error. Please retry"), false
+	}
+
 	if errAux != gorm.ErrRecordNotFound && tempForm.Identificationcard != tempParam.Identificationcard {
 		return u.Message(false, "there is client with this identification to send in Form"), false
 	}
 	if errSeudonimo != gorm.ErrRecordNotFound && tempSeudonimo.Seudonimo != tempParam.Seudonimo {
 		return u.Message(false, "there is client with this Seudonimo to send in Form"), false
+	}
+	if errEmail != gorm.ErrRecordNotFound && tempEmail.Email != tempParam.Email {
+		return u.Message(false, "there is client with this Email to send in Form"), false
 	}
 
 	return u.Message(false, "Requirement passed"), true
