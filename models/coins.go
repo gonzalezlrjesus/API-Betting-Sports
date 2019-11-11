@@ -42,6 +42,19 @@ func (coins *Coins) UpdateCoins(amountDeposit float64) map[string]interface{} {
 
 }
 
+// WithdrawalCoins of a client in DB
+func (coins *Coins) WithdrawalCoins(amountDeposit float64) map[string]interface{} {
+
+	coins.Amount = ((coins.Amount) - amountDeposit)
+
+	GetDB().Save(&coins)
+
+	response := u.Message(true, "client has updated your coins")
+	response["coins"] = coins
+	return response
+
+}
+
 // DecreaseCoins of client in DB
 func (coins *Coins) DecreaseCoins(rematesAmount float64) map[string]interface{} {
 

@@ -151,6 +151,7 @@ func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 	if temp.Identificationcard != client.Identificationcard {
 		response["Coins"] = UpdateIdentificationCoinClient(temp.Identificationcard, client.Identificationcard)
 		response["Deposit"] = UpdateIdentificationClientDeposit(temp.Identificationcard, client.Identificationcard)
+		response["Retiros"] = UpdateIdentificationClientRetiro(temp.Identificationcard, client.Identificationcard)
 		temp.Identificationcard = client.Identificationcard
 	}
 	GetDB().Save(&temp)

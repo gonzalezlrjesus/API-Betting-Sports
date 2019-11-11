@@ -32,6 +32,8 @@ func Routes() *mux.Router {
 	router.HandleFunc("/api/admin/clients", handlers.GetClientsFor).Methods("GET")
 	// To view all Deposit Client
 	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.HistorialDeposits).Methods("GET")
+	// To view all withdrawal Client
+	router.HandleFunc("/api/admin/clients/{idClient}/withdrawal", handlers.HistorialWithdrawal).Methods("GET")
 	// To View all Events
 	router.HandleFunc("/api/admin/event", handlers.GetEventsFor).Methods("GET")
 	// To View all Racings
@@ -84,6 +86,8 @@ func Routes() *mux.Router {
 
 	// Add a deposit to money in client account
 	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.AddDeposit).Methods("POST")
+	// Do a withdrawal to money in client account
+	router.HandleFunc("/api/admin/clients/{idClient}/withdrawal", handlers.Dowithdrawal).Methods("POST")
 	// Add a auction number
 	router.HandleFunc("/api/admin/components/{idComponent}/auctionnumber", handlers.AddAuctionNumber).Methods("POST")
 
