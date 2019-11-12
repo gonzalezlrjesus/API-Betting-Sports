@@ -226,12 +226,14 @@ func (c *Clientmodel) Read() {
 
 				CreateRemates(idCarrera, a.idCaballo, a.NumeroCaballo, a.Seudonimo, a.Monto, a.Horsename)
 				montoTotal = montoTotal + a.Monto
+				// fmt.Println("Monto CASA:", montoTotal)
 				if finalizacion == "finalizo" {
 					fmt.Println("Monto finalizo CASA:", montoTotal)
 					CreateTablas(idCarrera, montoTotal)
 					arrayRemates = nil
 					CloseRacing(idCarrera)
 					idCarrera = ""
+					montoTotal = 0
 				}
 
 			} else if a.Seudonimo == "vacio" {
@@ -258,12 +260,14 @@ func (c *Clientmodel) Read() {
 				temp.DecreaseCoins(float64(respaldoActual.Monto))
 				CreateRemates(idCarrera, respaldoActual.idCaballo, respaldoActual.NumeroCaballo, respaldoActual.Seudonimo, respaldoActual.Monto, respaldoActual.Horsename)
 				montoTotal = montoTotal + respaldoActual.Monto
+				// fmt.Println("Monto VACIO:", montoTotal)
 				if finalizacion == "finalizo" {
 					fmt.Println("Monto finalizo CLIENTE:", montoTotal)
 					CreateTablas(idCarrera, montoTotal)
 					arrayRemates = nil
 					CloseRacing(idCarrera)
 					idCarrera = ""
+					montoTotal = 0
 				}
 
 			}
