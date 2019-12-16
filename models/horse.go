@@ -14,6 +14,7 @@ type Horse struct {
 	Racingid      uint   `json:"racingid"`
 	Horsename     string `json:"horsename"`
 	Numero        uint   `json:"numero"`
+	State         string `json:"state"`
 }
 
 // CreateHorseModel add a new race horse array to db in the table Horse
@@ -116,6 +117,27 @@ func DeleteAllHorses(idRacing uint) bool {
 	}
 
 	return true
+}
+
+// withdrawHorse withdraw Horse .
+func WithdrawHorse(idHorse uint) map[string]interface{} {
+
+	temp := &Horse{}
+	//check and delete all horses
+	err := GetDB().Table("horses").Where("id = ?", idHorse).First(temp).Error
+	if err == gorm.ErrRecordNotFound {
+		fmt.Println("Not found : ", err)
+		return u.Message(true, "Horse has not found")
+	}
+
+	temp.State = "withdrawed"
+
+	GetDB().Save(&temp)
+
+	response := u.Message(true, "Horse has been withdrawed")
+	response["horse"] = temp
+	return response
+
 }
 
 // ---------------------------Validations------------------------------

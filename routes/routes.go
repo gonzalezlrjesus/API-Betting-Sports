@@ -72,6 +72,8 @@ func Routes() *mux.Router {
 	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.UpdateRacingComponents).Methods("PUT")
 	// Update Horse
 	router.HandleFunc("/api/admin/racing/{idRacing}/horse/{idHorse}", handlers.UpdateHorse).Methods("PUT")
+	// Update Horse state
+	router.HandleFunc("/api/admin/racing/horse/{idHorse}", handlers.WithdrawHorseBefore).Methods("PUT")
 
 	// Delete Cliente
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.DeleteClient).Methods("DELETE")

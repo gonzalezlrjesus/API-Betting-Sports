@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-
+	"fmt"
 	"github.com/gorilla/mux"
 )
 
@@ -72,6 +72,23 @@ var GetHorses = func(w http.ResponseWriter, r *http.Request) {
 	idRacing := vars["idRacing"]
 
 	data := models.GetHorses(&idRacing)
+	resp := u.Message(true, "success")
+	resp["data"] = data
+	u.Respond(w, resp)
+}
+
+// WithdrawHorseBefore Withdraw Horse Before auction
+var WithdrawHorseBefore = func(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idHorse := vars["idHorse"]
+
+	var idHorseData string
+
+	json.NewDecoder(r.Body).Decode(idHorseData)
+	
+	tempUint64, _ := strconv.ParseUint(idHorse, 10, 32)
+
+	data := models.WithdrawHorse(uint(tempUint64))
 	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp)
