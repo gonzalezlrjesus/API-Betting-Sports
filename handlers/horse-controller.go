@@ -4,9 +4,10 @@ import (
 	"API-Betting-Sports/models"
 	u "API-Betting-Sports/utils"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
-	"fmt"
+
 	"github.com/gorilla/mux"
 )
 
@@ -81,14 +82,12 @@ var GetHorses = func(w http.ResponseWriter, r *http.Request) {
 var WithdrawHorseBefore = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idHorse := vars["idHorse"]
-
-	var idHorseData string
-
-	json.NewDecoder(r.Body).Decode(idHorseData)
-	
+	idRacing := vars["idRacing"]
+	fmt.Println(idRacing, idHorse)
 	tempUint64, _ := strconv.ParseUint(idHorse, 10, 32)
+	tempRacing, _ := strconv.ParseUint(idRacing, 10, 32)
 
-	data := models.WithdrawHorse(uint(tempUint64))
+	data := models.WithdrawHorse(uint(tempUint64), uint(tempRacing))
 	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp)

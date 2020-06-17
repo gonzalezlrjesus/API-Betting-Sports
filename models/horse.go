@@ -1,9 +1,9 @@
 package models
 
 import (
-	"fmt"
-
 	u "API-Betting-Sports/utils"
+	"fmt"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -11,10 +11,10 @@ import (
 // Horse struct
 type Horse struct {
 	gorm.Model
-	Racingid      uint   `json:"racingid"`
-	Horsename     string `json:"horsename"`
-	Numero        uint   `json:"numero"`
-	State         string `json:"state"`
+	Racingid  uint   `json:"racingid"`
+	Horsename string `json:"horsename"`
+	Numero    uint   `json:"numero"`
+	State     string `json:"state"`
 }
 
 // CreateHorseModel add a new race horse array to db in the table Horse
@@ -119,12 +119,26 @@ func DeleteAllHorses(idRacing uint) bool {
 	return true
 }
 
-// withdrawHorse withdraw Horse .
-func WithdrawHorse(idHorse uint) map[string]interface{} {
+// WithdrawHorse withdraw Horse .
+func WithdrawHorse(idHorse uint, idRacing uint) map[string]interface{} {
 
 	temp := &Horse{}
-	//check and delete all horses
-	err := GetDB().Table("horses").Where("id = ?", idHorse).First(temp).Error
+	tempRacing := &Racing{}
+	errRacing := GetDB().Table("racings").Where("id = ?", idRacing).First(tempRacing).Error
+	if errRacing == gorm.ErrRecordNotFound {
+		fmt.Println("Racings Not found : ", errRacing)
+		return u.Message(true, "Racings has not found")
+	}
+	// Debo validar si el server time es mayor o menor que tempRacing.Starttime
+	// Si es menor retiro caballo , color rojo en frontend cliente y no se remata
+	// si es mayor retiro caballo, pregunto si apostaron por el el si es positivo
+	// devuelvo dinero a apostador y modifico monto total a pagar
+	// si no se aposto retiro caballo y modifico monto
+	//
+
+	//check and retirar caballo especifico
+	err := GetDB().Table("horses").Where("id = ? AND racingid = ?", idHorse, idRacing).First(temp).Error
+	fmt.Println("err : ", err)
 	if err == gorm.ErrRecordNotFound {
 		fmt.Println("Not found : ", err)
 		return u.Message(true, "Horse has not found")
@@ -133,6 +147,21 @@ func WithdrawHorse(idHorse uint) map[string]interface{} {
 	temp.State = "withdrawed"
 
 	GetDB().Save(&temp)
+
+	SegAntesRemate := tempRacing.Auctiontime.Sub(time.Now()).Seconds()
+	SegDespuesCarrera := tempRacing.Starttime.Sub(time.Now()).Seconds()
+
+	if SegAntesRemate > 0 {
+		fmt.Println("No ha inicidado  Remate: ", SegAntesRemate)
+	}
+
+	if (SegAntesRemate < 0) == true && (SegDespuesCarrera > 0) == true {
+		fmt.Println("Estan Rematando: ", SegDespuesCarrera)
+	}
+
+	if (SegAntesRemate < 0) == true && (SegDespuesCarrera < 0) == true {
+		fmt.Println("Termino Remate y Carrera: ", SegDespuesCarrera)
+	}
 
 	response := u.Message(true, "Horse has been withdrawed")
 	response["horse"] = temp

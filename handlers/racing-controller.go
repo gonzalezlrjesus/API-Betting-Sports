@@ -79,7 +79,7 @@ var GetSpecificRacing = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp)
 }
 
-// GetSpecificRacing find and show Racing within event
+// GetSpecificRacingWithEvent find and show Racing within event
 var GetSpecificRacingWithEvent = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idEvent := vars["idEvent"]
@@ -92,7 +92,7 @@ var GetSpecificRacingWithEvent = func(w http.ResponseWriter, r *http.Request) {
 }
 
 // RepartirGanancias repartir ganancias al ganador
-var RepartirGanancias= func(w http.ResponseWriter, r *http.Request) {
+var RepartirGanancias = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idRacing := vars["idRacing"]
 	idHorse := vars["idHorse"]

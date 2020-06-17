@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"net/http"
 	"API-Betting-Sports/models"
 	u "API-Betting-Sports/utils"
+	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -20,7 +20,7 @@ var RematesRacing = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp)
 }
 
-// GetRacingsFor list Racings
+// GetRematesFor list Racings
 var GetRematesFor = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idRacing := vars["idRacing"]

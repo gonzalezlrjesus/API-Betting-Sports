@@ -72,8 +72,6 @@ func Routes() *mux.Router {
 	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.UpdateRacingComponents).Methods("PUT")
 	// Update Horse
 	router.HandleFunc("/api/admin/racing/{idRacing}/horse/{idHorse}", handlers.UpdateHorse).Methods("PUT")
-	// Update Horse state
-	router.HandleFunc("/api/admin/racing/horse/{idHorse}", handlers.WithdrawHorseBefore).Methods("PUT")
 
 	// Delete Cliente
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.DeleteClient).Methods("DELETE")
@@ -92,6 +90,9 @@ func Routes() *mux.Router {
 	router.HandleFunc("/api/admin/clients/{idClient}/withdrawal", handlers.Dowithdrawal).Methods("POST")
 	// Add a auction number
 	router.HandleFunc("/api/admin/components/{idComponent}/auctionnumber", handlers.AddAuctionNumber).Methods("POST")
+
+	//********************// Update Horse state retirar caballos*************************
+	router.HandleFunc("/api/admin/racing/{idRacing}/horse/{idHorse}", handlers.WithdrawHorseBefore).Methods("PATCH")
 
 	// Repartir Ganancias
 	router.HandleFunc("/api/admin/{idRacing}/{idHorse}", handlers.RepartirGanancias).Methods("GET")

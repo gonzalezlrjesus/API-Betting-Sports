@@ -1,8 +1,8 @@
 package models
 
 import (
-	"fmt"
 	u "API-Betting-Sports/utils"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
 )
@@ -37,7 +37,7 @@ func (retiro *Retiro) Dowithdrawal() map[string]interface{} {
 	return response
 }
 
-// GetAllDepositsClient Client db
+// GetAllWithdrawal Client db
 func GetAllWithdrawal(idClient *string) map[string]interface{} {
 
 	temp := &[]Deposit{}
@@ -54,7 +54,7 @@ func GetAllWithdrawal(idClient *string) map[string]interface{} {
 	return response
 }
 
-// UpdateIdentificationClientDeposit update identificacionCard of client all record in table deposits of db
+// UpdateIdentificationClientRetiro update identificacionCard of client all record in table deposits of db
 func UpdateIdentificationClientRetiro(Clientidentificationcard, newIdentification string) map[string]interface{} {
 
 	temp := &[]Retiro{}
