@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"API-Betting-Sports/models"
-	u "API-Betting-Sports/utils"
+	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/gorilla/mux"
 )

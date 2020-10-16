@@ -1,9 +1,10 @@
 package routes
 
 import (
-	w "API-Betting-Sports/auth"
-	"API-Betting-Sports/handlers"
-	"API-Betting-Sports/models"
+	"github.com/gonzalezlrjesus/API-Betting-Sports/handlers"
+	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
+
+	w "github.com/gonzalezlrjesus/API-Betting-Sports/auth"
 
 	"github.com/gorilla/mux"
 )

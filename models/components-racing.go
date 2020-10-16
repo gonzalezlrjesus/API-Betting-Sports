@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	u "API-Betting-Sports/utils"
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 	"github.com/jinzhu/gorm"
 )
 

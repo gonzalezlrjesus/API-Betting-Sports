@@ -1,7 +1,7 @@
 package models
 
 import (
-	u "API-Betting-Sports/utils"
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 	"encoding/json"
 	"fmt"
 

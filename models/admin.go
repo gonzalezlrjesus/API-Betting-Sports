@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	u "API-Betting-Sports/utils"
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"

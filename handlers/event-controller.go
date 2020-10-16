@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"API-Betting-Sports/models"
-	u "API-Betting-Sports/utils"
+	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"

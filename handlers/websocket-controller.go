@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"API-Betting-Sports/models"
+	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
 	"net/http"
 
 	"github.com/gorilla/websocket"

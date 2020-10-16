@@ -1,7 +1,7 @@
 package main
 
 import (
-	"API-Betting-Sports/routes"
+	"github.com/gonzalezlrjesus/API-Betting-Sports/routes"
 	"fmt"
 	"net/http"
 	"os"

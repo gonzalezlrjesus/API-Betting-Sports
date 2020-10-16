@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"API-Betting-Sports/models"
-	u "API-Betting-Sports/utils"
+	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
