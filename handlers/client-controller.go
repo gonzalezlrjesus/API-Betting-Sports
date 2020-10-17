@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
-	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/gorilla/mux"
 )
@@ -17,12 +18,12 @@ var CreateClient = func(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(client) //decode the request body into struct and failed if any error occur
 
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request"))
+		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
 	}
 
 	resp := client.CreateClient() //Create client
-	u.Respond(w, resp)
+	u.Respond(w, resp, 201)
 }
 
 // AuthenticateClient client
@@ -32,13 +33,12 @@ var AuthenticateClient = func(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(client) //decode the request body into struct and failed if any error occur
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request"))
+		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
 	}
 
-
 	resp := models.LoginClient(client.Password, client.Seudonimo)
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // GetClientsFor list clients
@@ -47,7 +47,7 @@ var GetClientsFor = func(w http.ResponseWriter, r *http.Request) {
 	data := models.GetClients()
 	resp := u.Message(true, "success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // GetSpecificClient find and show client
@@ -58,7 +58,7 @@ var GetSpecificClient = func(w http.ResponseWriter, r *http.Request) {
 	data, respString := models.GetClient(&idClient)
 	resp := u.Message(true, respString)
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // UpdateClient find client
@@ -69,14 +69,14 @@ var UpdateClient = func(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(client) //decode the request body into struct and failed if any error occur
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request"))
+		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
 	}
 
 	data := client.UpdateClient(&idClient)
 	resp := u.Message(true, "Success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // StateClient find client
@@ -87,14 +87,14 @@ var StateClient = func(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(setStateClient) //decode the request body into struct and failed if any error occur
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request"))
+		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
 	}
 
 	data := models.UpdateStateClient(&idClient, setStateClient)
 	resp := u.Message(true, "Success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // DeleteClient client
@@ -104,5 +104,5 @@ var DeleteClient = func(w http.ResponseWriter, r *http.Request) {
 
 	data := models.DeleteClient(&idClient)
 	resp := u.Message(true, strconv.FormatBool(data))
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }

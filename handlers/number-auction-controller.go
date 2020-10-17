@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+
 	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
@@ -19,13 +20,13 @@ var AddAuctionNumber = func(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(AuctionNumber)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Error while decoding request body"))
+		u.Respond(w, u.Message(false, "Error while decoding request body"), 400)
 		return
 	}
 	tempUint64, _ := strconv.ParseUint(idComponent, 10, 32)
 	AuctionNumber.Racingcomponentid = uint(tempUint64)
 	resp := AuctionNumber.AddAuctionNumber()
-	u.Respond(w, resp)
+	u.Respond(w, resp, 201)
 }
 
 // GetAuctionNumbers client
@@ -37,7 +38,7 @@ var GetAuctionNumbers = func(w http.ResponseWriter, r *http.Request) {
 	data := models.GetAuctionNumbers(&idComponent)
 	resp := u.Message(true, "success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // DeleteAuctionNumber delete a auction Number
@@ -48,5 +49,5 @@ var DeleteAuctionNumber = func(w http.ResponseWriter, r *http.Request) {
 
 	data := models.DeleteAuctionNumber(&idComponent, &idauctionnumber)
 	resp := u.Message(true, strconv.FormatBool(data))
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }

@@ -1,9 +1,10 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
-	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -17,7 +18,7 @@ var RematesRacing = func(w http.ResponseWriter, r *http.Request) {
 	data := models.GetRemates(&idRacing)
 	resp := u.Message(true, "success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // GetRematesFor list Racings
@@ -28,5 +29,5 @@ var GetRematesFor = func(w http.ResponseWriter, r *http.Request) {
 	data := models.GetRemates(&idRacing)
 	resp := u.Message(true, "success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }

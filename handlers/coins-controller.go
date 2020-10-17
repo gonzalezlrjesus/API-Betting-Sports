@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+
 	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
@@ -17,5 +18,5 @@ var CoinClient = func(w http.ResponseWriter, r *http.Request) {
 	data := models.GetCoinsClient(&idClient)
 	resp := u.Message(true, "success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }

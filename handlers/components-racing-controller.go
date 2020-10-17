@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+
 	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
@@ -18,12 +19,12 @@ var UpdateRacingComponents = func(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(racingComponents)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Error while decoding request body"))
+		u.Respond(w, u.Message(false, "Error while decoding request body"), 400)
 		return
 	}
 
 	resp := racingComponents.UpdateRacingComponents(idRacing)
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // GetRacingComponents Get racing components
@@ -35,5 +36,5 @@ var GetRacingComponents = func(w http.ResponseWriter, r *http.Request) {
 	data := models.GetRacingComponents(&idRacing)
 	resp := u.Message(true, "success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }

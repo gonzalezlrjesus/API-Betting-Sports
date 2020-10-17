@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
-	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/gorilla/mux"
 )
@@ -26,12 +27,12 @@ var CreateHorse = func(w http.ResponseWriter, r *http.Request) {
 	newsList := make([]models.Horse, 0)
 	err := json.NewDecoder(r.Body).Decode(&newsList)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Error while decoding request body"))
+		u.Respond(w, u.Message(false, "Error while decoding request body"), 400)
 		return
 	}
 	tempUint64, _ := strconv.ParseUint(idRacing, 10, 32)
 	resp := models.CreateHorseModel(newsList, uint(tempUint64))
-	u.Respond(w, resp)
+	u.Respond(w, resp, 201)
 }
 
 // UpdateHorse Horse data
@@ -45,14 +46,14 @@ var UpdateHorse = func(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(horse) //decode the request body into struct and failed if any error occur
 	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request"))
+		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
 	}
 
 	data := horse.UpdateHorse(&params.idRacing, &params.idHorse)
 	resp := u.Message(true, "Success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // DeleteHorse Delete Horse
@@ -64,7 +65,7 @@ var DeleteHorse = func(w http.ResponseWriter, r *http.Request) {
 
 	data := models.DeleteHorse(&params.idRacing, &params.idHorse)
 	resp := u.Message(true, strconv.FormatBool(data))
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // GetHorses list Horses
@@ -75,7 +76,7 @@ var GetHorses = func(w http.ResponseWriter, r *http.Request) {
 	data := models.GetHorses(&idRacing)
 	resp := u.Message(true, "success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }
 
 // WithdrawHorseBefore Withdraw Horse Before auction
@@ -90,5 +91,5 @@ var WithdrawHorseBefore = func(w http.ResponseWriter, r *http.Request) {
 	data := models.WithdrawHorse(uint(tempUint64), uint(tempRacing))
 	resp := u.Message(true, "success")
 	resp["data"] = data
-	u.Respond(w, resp)
+	u.Respond(w, resp, 200)
 }

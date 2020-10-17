@@ -2,10 +2,11 @@ package auth
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
+
 	"github.com/gonzalezlrjesus/API-Betting-Sports/models"
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
@@ -17,36 +18,34 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//List of endpoints that doesn't require auth
-		notAuth := []string{"/api/admin", "/api/admin/login", "/api/clients/login", "/ws", "/api/admin/client/app"}
-
-		requestPath := r.URL.Path //current request path
+		notAuth := []string{
+			"/api/admin",
+			"/api/admin/login",
+			"/api/admin/client/app",
+			"/api/clients/login",
+			"/ws",
+		}
+		//current request path
+		requestPath := r.URL.Path
 
 		//check if request does not need authentication, serve the request if it doesn't need it
 		for _, value := range notAuth {
-
 			if value == requestPath {
 				next.ServeHTTP(w, r)
 				return
 			}
 		}
 
-		response := make(map[string]interface{})
 		tokenHeader := r.Header.Get("Authorization") //Grab the token from the header
 
-		if tokenHeader == "" { //Token is missing, returns with error code 403 Unauthorized
-			response = u.Message(false, "Missing auth token")
-			w.WriteHeader(http.StatusForbidden)
-			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+		if tokenHeader == "" { //Token is missing
+			sendErrorResponse(w, "Missing auth token")
 			return
 		}
 
-		splitted := strings.Split(tokenHeader, " ") //The token normally comes in format `Bearer {token-body}`, we check if the retrieved token matched this requirement
+		splitted := strings.Split(tokenHeader, " ") //The token normally comes in format `Bearer {token-body}`
 		if len(splitted) != 2 {
-			response = u.Message(false, "Invalid/Malformed auth token")
-			w.WriteHeader(http.StatusForbidden)
-			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+			sendErrorResponse(w, "Invalid/Malformed auth token")
 			return
 		}
 
@@ -57,26 +56,25 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 			return []byte(os.Getenv("token_password")), nil
 		})
 
-		if err != nil { //Malformed token, returns with http code 403 as usual
-			response = u.Message(false, "Malformed authentication token")
-			w.WriteHeader(http.StatusForbidden)
-			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+		if err != nil { //Malformed token
+			sendErrorResponse(w, "Malformed authentication token")
 			return
 		}
 
 		if !token.Valid { //Token is invalid, maybe not signed on this server
-			response = u.Message(false, "Token is not valid.")
-			w.WriteHeader(http.StatusForbidden)
-			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+			sendErrorResponse(w, "Token is not valid")
 			return
 		}
 
 		//Everything went well, proceed with the request and set the caller to the user retrieved from the parsed token
-		fmt.Printf("User %v", tk.UserID) //Useful for monitoring
+		log.Printf("User %v", tk.UserID) //Useful for monitoring
 		ctx := context.WithValue(r.Context(), "user", tk.UserID)
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r) //proceed in the middleware chain!
 	})
+}
+
+func sendErrorResponse(w http.ResponseWriter, message string) {
+	response := u.Message(false, message)
+	u.Respond(w, response, 401)
 }
