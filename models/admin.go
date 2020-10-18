@@ -1,9 +1,10 @@
 package models
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"strings"
+
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/dgrijalva/jwt-go"
@@ -25,7 +26,7 @@ type Admin struct {
 	Token    string `json:"token";sql:"-"`
 }
 
-// Validate struct that Front-End to Back-End
+// Validate admin struct
 func (admin *Admin) Validate() (map[string]interface{}, bool) {
 
 	if !strings.Contains(admin.Email, "@") {
@@ -67,13 +68,8 @@ func (admin *Admin) Create() map[string]interface{} {
 		return u.Message(false, "Failed to create admin, connection error.")
 	}
 
-	//Create new JWT token for the newly registered admin
-	tk := &Token{UserID: admin.ID}
-	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
-	admin.Token = tokenString
-
-	admin.Password = "" //delete password
+	admin.Token = createToken(admin.ID)
+	admin.Password = ""
 
 	response := u.Message(true, "admin has been created")
 	response["admin"] = admin
@@ -96,18 +92,9 @@ func Login(email, password string) map[string]interface{} {
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword { //Password does not match!
 		return u.Message(false, "Invalid login credentials. Please try again")
 	}
-	//Worked! Logged In
-	account.Password = ""
 
-	//Create JWT token
-	tk := &Token{UserID: account.ID}
-	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	tokenString, err := token.SignedString([]byte(os.Getenv("token_password")))
-	if err != nil {
-		// fmt.Println("sas", err)
-		fmt.Println(err)
-	}
-	account.Token = tokenString //Store the token in the response
+	account.Token = createToken(account.ID)
+	account.Password = ""
 
 	resp := u.Message(true, "Logged In")
 	resp["account"] = account
@@ -115,10 +102,10 @@ func Login(email, password string) map[string]interface{} {
 }
 
 // GetUser from DB
-func GetUser(u uint) *Admin {
+func GetUser(id uint) *Admin {
 
 	acc := &Admin{}
-	GetDB().Table("admins").Where("id = ?", u).First(acc)
+	GetDB().Table("admins").Where("id = ?", id).First(acc)
 	if acc.Email == "" { //User not found!
 		return nil
 	}
@@ -133,9 +120,18 @@ func GetAdmins() []*Admin {
 	admins := make([]*Admin, 0)
 	err := GetDB().Table("admins").Find(&admins).Error
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil
 	}
 
 	return admins
+}
+
+func createToken(id uint) string {
+	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), &Token{UserID: id})
+	tokenString, err := token.SignedString([]byte(os.Getenv("token_password")))
+	if err != nil {
+		log.Println(err)
+	}
+	return tokenString
 }

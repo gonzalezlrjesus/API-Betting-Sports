@@ -12,7 +12,7 @@ import (
 var CreateAdmin = func(w http.ResponseWriter, r *http.Request) {
 
 	admin := &models.Admin{}
-	err := json.NewDecoder(r.Body).Decode(admin) //decode the request body into struct and failed if any error occur
+	err := json.NewDecoder(r.Body).Decode(admin)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
@@ -22,12 +22,11 @@ var CreateAdmin = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp, 201)
 }
 
-// Authenticate var export
+// Authenticate admin user
 var Authenticate = func(w http.ResponseWriter, r *http.Request) {
 
 	admin := &models.Admin{}
-
-	err := json.NewDecoder(r.Body).Decode(admin) //decode the request body into struct and failed if any error occur
+	err := json.NewDecoder(r.Body).Decode(admin)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
@@ -37,11 +36,12 @@ var Authenticate = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp, 200)
 }
 
-// GetAdminFor list system admin
+// GetAdminFor list admin user
 var GetAdminFor = func(w http.ResponseWriter, r *http.Request) {
 
 	data := models.GetAdmins()
 	resp := u.Message(true, "success")
 	resp["data"] = data
+
 	u.Respond(w, resp, 200)
 }
