@@ -14,107 +14,131 @@ func Routes() *mux.Router {
 	go models.Manager.Start()
 	router := mux.NewRouter()
 
-	// -------------------Routes Admin---------------------------------------
+	// -------------------Admin---------------------------------------
 
 	// Create new Admin
 	router.HandleFunc("/api/admin", handlers.CreateAdmin).Methods("POST")
-	// Create new Client from Admin APP
-	router.HandleFunc("/api/admin/clients", handlers.CreateClient).Methods("POST")
-	// Create new Event
-	router.HandleFunc("/api/admin/event", handlers.CreateEvent).Methods("POST")
-	// Create new Racing
-	router.HandleFunc("/api/admin/event/{idEvent}/racing", handlers.CreateRacing).Methods("POST")
-	// Create new a Horse
-	router.HandleFunc("/api/admin/racing/{idRacing}/horse", handlers.CreateHorse).Methods("POST")
-
+	// Login Admin
+	router.HandleFunc("/api/admin/login", handlers.Authenticate).Methods("POST")
 	// To view all admin
 	router.HandleFunc("/api/admin", handlers.GetAdminFor).Methods("GET")
+
+	// -------------------Clients-------------------------------------
+
+	// Create new Client from Admin APP
+	router.HandleFunc("/api/admin/clients", handlers.CreateClient).Methods("POST")
+	// Create new Client from Client APP
+	router.HandleFunc("/api/admin/client/app", handlers.CreateClient).Methods("POST")
+	// Login Client
+	router.HandleFunc("/api/clients/login", handlers.AuthenticateClient).Methods("POST")
 	// To View all clients
 	router.HandleFunc("/api/admin/clients", handlers.GetClientsFor).Methods("GET")
-	// To view all Deposit Client
-	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.HistorialDeposits).Methods("GET")
-	// To view all withdrawal Client
-	router.HandleFunc("/api/admin/clients/{idClient}/withdrawal", handlers.HistorialWithdrawal).Methods("GET")
-	// To View all Events
-	router.HandleFunc("/api/admin/event", handlers.GetEventsFor).Methods("GET")
-	// To View all Racings
-	router.HandleFunc("/api/admin/event/{idEvent}/racing", handlers.GetRacingsFor).Methods("GET")
-	// To View all Auction Number of specify Racing Component
-	router.HandleFunc("/api/admin/components/{idComponent}/auctionnumber", handlers.GetAuctionNumbers).Methods("GET")
-	// To View all Horses
-	router.HandleFunc("/api/admin/racing/{idRacing}/horse", handlers.GetHorses).Methods("GET")
-
 	// To a specific client
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.GetSpecificClient).Methods("GET")
-	// To a specific Coin Client
-	router.HandleFunc("/api/admin/clients/{idClient}/coin", handlers.CoinClient).Methods("GET")
-	// To a specific event
-	router.HandleFunc("/api/admin/event/{idEvent}", handlers.GetSpecificEvent).Methods("GET")
-	// To a specific Racing
-	router.HandleFunc("/api/admin/racing/{idRacing}", handlers.GetSpecificRacing).Methods("GET")
-	// To a specific Racing within Event
-	router.HandleFunc("/api/admin/racing/{idRacing}/{idEvent}", handlers.GetSpecificRacingWithEvent).Methods("GET")
-	// To a specific Racing Components
-	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.GetRacingComponents).Methods("GET")
-	// To a specific remates Racings
-	router.HandleFunc("/api/admin/{idRacing}/remates", handlers.GetRematesFor).Methods("GET")
-	// To a specific Tablas Remates
-	router.HandleFunc("/api/admin/{idRacing}/tablas", handlers.GetTablas).Methods("GET")
-
 	// Update Client from Admin APP
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.UpdateClient).Methods("PUT")
 	// Update State Blocked or Enable to access Client
 	router.HandleFunc("/api/admin/clients/{idClient}/state", handlers.StateClient).Methods("PUT")
-	// Update Event
-	router.HandleFunc("/api/admin/event/{idEvent}", handlers.UpdateEvent).Methods("PUT")
-	// Update Racing
-	router.HandleFunc("/api/admin/event/{idEvent}/racing", handlers.UpdateRacing).Methods("PUT")
-	// Update RacingComponents
-	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.UpdateRacingComponents).Methods("PUT")
-	// Update Horse
-	router.HandleFunc("/api/admin/racing/{idRacing}/horse/{idHorse}", handlers.UpdateHorse).Methods("PUT")
-
 	// Delete Cliente
 	router.HandleFunc("/api/admin/clients/{idClient}", handlers.DeleteClient).Methods("DELETE")
+
+	// -------------------Event---------------------------------------
+
+	// Create new Event
+	router.HandleFunc("/api/admin/event", handlers.CreateEvent).Methods("POST")
+	// To View all Events
+	router.HandleFunc("/api/admin/event", handlers.GetEventsFor).Methods("GET")
+	// To a specific event
+	router.HandleFunc("/api/admin/event/{idEvent}", handlers.GetSpecificEvent).Methods("GET")
+	// Update Event
+	router.HandleFunc("/api/admin/event/{idEvent}", handlers.UpdateEvent).Methods("PUT")
 	// Delete Event
 	router.HandleFunc("/api/admin/event/{idEvent}", handlers.DeleteEvent).Methods("DELETE")
+
+	// -------------------Racing--------------------------------------
+
+	// Create new Racing
+	router.HandleFunc("/api/admin/event/{idEvent}/racing", handlers.CreateRacing).Methods("POST")
+	// To View all Racings
+	router.HandleFunc("/api/admin/event/{idEvent}/racing", handlers.GetRacingsFor).Methods("GET")
+	// To a specific Racing
+	router.HandleFunc("/api/admin/racing/{idRacing}", handlers.GetSpecificRacing).Methods("GET")
+	// To a specific Racing within Event
+	router.HandleFunc("/api/admin/racing/{idRacing}/{idEvent}", handlers.GetSpecificRacingWithEvent).Methods("GET")
+	// Repartir Ganancias
+	router.HandleFunc("/api/admin/{idRacing}/{idHorse}", handlers.RepartirGanancias).Methods("GET")
+	// Update Racing
+	router.HandleFunc("/api/admin/event/{idEvent}/racing", handlers.UpdateRacing).Methods("PUT")
 	// Delete Racing
 	router.HandleFunc("/api/admin/event/{idEvent}/racing/{idRacing}", handlers.DeleteRacing).Methods("DELETE")
-	// Delete a auction number
-	router.HandleFunc("/api/admin/event/components/{idComponent}/auctionnumber/{idauctionnumber}", handlers.DeleteAuctionNumber).Methods("DELETE")
+
+	// -------------------Horse---------------------------------------
+
+	// Create new a Horse
+	router.HandleFunc("/api/admin/racing/{idRacing}/horse", handlers.CreateHorse).Methods("POST")
+	// To View all Horses
+	router.HandleFunc("/api/admin/racing/{idRacing}/horse", handlers.GetHorses).Methods("GET")
+	//********************// Update Horse state retirar caballos*************************
+	router.HandleFunc("/api/admin/racing/{idRacing}/horse/{idHorse}", handlers.WithdrawHorseBefore).Methods("PATCH")
+	// Update Horse
+	router.HandleFunc("/api/admin/racing/{idRacing}/horse/{idHorse}", handlers.UpdateHorse).Methods("PUT")
 	// Delete a Horse
 	router.HandleFunc("/api/admin/racing/{idRacing}/horse/{idHorse}", handlers.DeleteHorse).Methods("DELETE")
 
-	// Add a deposit to money in client account
-	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.AddDeposit).Methods("POST")
+	// -------------------Withdrawal----------------------------------
+
 	// Do a withdrawal to money in client account
 	router.HandleFunc("/api/admin/clients/{idClient}/withdrawal", handlers.Dowithdrawal).Methods("POST")
+	// To view all withdrawal Client
+	router.HandleFunc("/api/admin/clients/{idClient}/withdrawal", handlers.HistorialWithdrawal).Methods("GET")
+
+	// -------------------Auctionnumber-------------------------------
+
 	// Add a auction number
 	router.HandleFunc("/api/admin/components/{idComponent}/auctionnumber", handlers.AddAuctionNumber).Methods("POST")
+	// To View all Auction Number of specify Racing Component
+	router.HandleFunc("/api/admin/components/{idComponent}/auctionnumber", handlers.GetAuctionNumbers).Methods("GET")
+	// Delete a auction number
+	router.HandleFunc("/api/admin/event/components/{idComponent}/auctionnumber/{idauctionnumber}", handlers.DeleteAuctionNumber).Methods("DELETE")
 
-	//********************// Update Horse state retirar caballos*************************
-	router.HandleFunc("/api/admin/racing/{idRacing}/horse/{idHorse}", handlers.WithdrawHorseBefore).Methods("PATCH")
+	// -------------------Components----------------------------------
 
-	// Repartir Ganancias
-	router.HandleFunc("/api/admin/{idRacing}/{idHorse}", handlers.RepartirGanancias).Methods("GET")
+	// To a specific Racing Components
+	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.GetRacingComponents).Methods("GET")
+	// Update RacingComponents
+	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.UpdateRacingComponents).Methods("PUT")
 
-	// Login Admin
-	router.HandleFunc("/api/admin/login", handlers.Authenticate).Methods("POST")
+	// -------------------Coin----------------------------------------
 
-	// -------------------Routes Client---------------------------------------
+	// To a specific Coin Client
+	router.HandleFunc("/api/admin/clients/{idClient}/coin", handlers.CoinClient).Methods("GET")
 
-	// Login Client
-	router.HandleFunc("/api/clients/login", handlers.AuthenticateClient).Methods("POST")
-	// Create new Client from Client APP
-	router.HandleFunc("/api/admin/client/app", handlers.CreateClient).Methods("POST")
+	// -------------------Remates-------------------------------------
 
-	// ------------------ WEBSOCKET ----------------------------
+	// To a specific remates Racings
+	router.HandleFunc("/api/admin/{idRacing}/remates", handlers.GetRematesFor).Methods("GET")
+
+	// -------------------Tablas--------------------------------------
+
+	// To a specific Tablas Remates
+	router.HandleFunc("/api/admin/{idRacing}/tablas", handlers.GetTablas).Methods("GET")
+
+	// -------------------Deposit-------------------------------------
+
+	// Add a deposit to money in client account
+	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.AddDeposit).Methods("POST")
+	// To view all Deposit Client
+	router.HandleFunc("/api/admin/clients/{idClient}/deposit", handlers.HistorialDeposits).Methods("GET")
+
+	// ------------------WEBSOCKET------------------------------------
 
 	// websocket to auctions
 	router.HandleFunc("/ws", handlers.WsPage)
 
-	// ------------------Middleware Auth Token JWT----------------------------
-	router.Use(w.JwtAuthentication) //attach JWT auth middleware
+	// ------------------Middleware Auth Token JWT--------------------
+
+	//attach JWT auth middleware
+	router.Use(w.JwtAuthentication)
 
 	return router
 }

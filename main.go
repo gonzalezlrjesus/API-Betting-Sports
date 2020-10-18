@@ -11,10 +11,10 @@ import (
 func main() {
 
 	port := config.GetPort()
-	c := config.GetCORS()
+	configCORS := config.GetCORS()
 
 	routes := routes.Routes()
-	handler := c.Handler(routes)
+	handler := configCORS.Handler(routes)
 
 	err := http.ListenAndServe(":"+port, handler) //Launch the app.
 	if err != nil {
