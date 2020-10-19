@@ -11,27 +11,25 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// CreateClient client
+// CreateClient .
 var CreateClient = func(w http.ResponseWriter, r *http.Request) {
 
 	client := &models.Client{}
-	err := json.NewDecoder(r.Body).Decode(client) //decode the request body into struct and failed if any error occur
-
+	err := json.NewDecoder(r.Body).Decode(client)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
 	}
 
-	resp := client.CreateClient() //Create client
+	resp := client.CreateClient()
 	u.Respond(w, resp, 201)
 }
 
-// AuthenticateClient client
+// AuthenticateClient .
 var AuthenticateClient = func(w http.ResponseWriter, r *http.Request) {
 
 	client := &models.Client{}
-
-	err := json.NewDecoder(r.Body).Decode(client) //decode the request body into struct and failed if any error occur
+	err := json.NewDecoder(r.Body).Decode(client)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
@@ -47,27 +45,28 @@ var GetClientsFor = func(w http.ResponseWriter, r *http.Request) {
 	data := models.GetClients()
 	resp := u.Message(true, "success")
 	resp["data"] = data
+
 	u.Respond(w, resp, 200)
 }
 
-// GetSpecificClient find and show client
+// GetSpecificClient .
 var GetSpecificClient = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idClient := vars["idClient"]
 
-	data, respString := models.GetClient(&idClient)
-	resp := u.Message(true, respString)
+	data := models.GetClient(&idClient)
+	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)
 }
 
-// UpdateClient find client
+// UpdateClient .
 var UpdateClient = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idClient := vars["idClient"]
 	client := &models.Client{}
 
-	err := json.NewDecoder(r.Body).Decode(client) //decode the request body into struct and failed if any error occur
+	err := json.NewDecoder(r.Body).Decode(client)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
@@ -79,19 +78,12 @@ var UpdateClient = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp, 200)
 }
 
-// StateClient find client
+// StateClient .
 var StateClient = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idClient := vars["idClient"]
-	setStateClient := &models.Client{}
 
-	err := json.NewDecoder(r.Body).Decode(setStateClient) //decode the request body into struct and failed if any error occur
-	if err != nil {
-		u.Respond(w, u.Message(false, "Invalid request"), 400)
-		return
-	}
-
-	data := models.UpdateStateClient(&idClient, setStateClient)
+	data := models.UpdateStateClient(&idClient)
 	resp := u.Message(true, "Success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)
