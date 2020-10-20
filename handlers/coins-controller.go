@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// CoinClient client
+// CoinClient .
 var CoinClient = func(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)

@@ -1,8 +1,9 @@
 package models
 
 import (
-	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 	"fmt"
+
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/jinzhu/gorm"
 )
@@ -32,7 +33,7 @@ func (retiro *Retiro) Dowithdrawal() map[string]interface{} {
 	}
 
 	response := u.Message(true, "deposit has been created")
-	response["updateCoins"] = temp.WithdrawalCoins(retiro.Amount)
+	response["updateCoins"] = temp.DecreaseCoins(retiro.Amount)
 	response["withdrawal"] = retiro
 	return response
 }
