@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/jinzhu/gorm"
@@ -29,15 +30,6 @@ func (auctionNumber *AuctionNumber) AddAuctionNumber() map[string]interface{} {
 
 // GetAuctionNumbers auction Numbers all
 func GetAuctionNumbers(idComponent *string) map[string]interface{} {
-
-	tempComponent := &RacingComponents{}
-
-	//check components
-	errcomponent := GetDB().Table("racing_components").Where("id = ?", *idComponent).First(tempComponent).Error
-
-	if errcomponent == gorm.ErrRecordNotFound {
-		return u.Message(true, "There is not component with this ID")
-	}
 
 	temp := &[]AuctionNumber{}
 

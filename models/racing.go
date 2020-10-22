@@ -1,10 +1,11 @@
 package models
 
 import (
-	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 	"fmt"
 	"math"
 	"strconv"
+
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	// "reflect"
 	"time"
@@ -234,7 +235,6 @@ func DeleteRacing(idEvent, idRacing *string) bool {
 
 	// Delete it
 	GetDB().Delete(tempRacing)
-	DeleteRacingComponents(tempRacing.ID)
 	DeleteAllHorses(tempRacing.ID)
 	return true
 }
@@ -263,7 +263,6 @@ func DeleteRacings(idComponent uint) bool {
 	}
 	fmt.Println("Error  : ", err)
 	for _, JustRace := range *racings {
-		// DeleteRacingComponents(JustRace.ID)
 		DeleteAllHorses(JustRace.ID)
 	}
 

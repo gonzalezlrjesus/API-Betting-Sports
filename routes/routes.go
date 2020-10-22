@@ -101,13 +101,6 @@ func Routes() *mux.Router {
 	// Delete a auction number
 	router.HandleFunc("/api/admin/event/components/{idComponent}/auctionnumber/{idauctionnumber}", handlers.DeleteAuctionNumber).Methods("DELETE")
 
-	// -------------------Components----------------------------------
-
-	// To a specific Racing Components
-	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.GetRacingComponents).Methods("GET")
-	// Update RacingComponents
-	router.HandleFunc("/api/admin/racing/{idRacing}/components", handlers.UpdateRacingComponents).Methods("PUT")
-
 	// -------------------Coin----------------------------------------
 
 	// To a specific Coin Client
