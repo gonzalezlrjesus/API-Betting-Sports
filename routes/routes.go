@@ -92,15 +92,6 @@ func Routes() *mux.Router {
 	// To view all withdrawal Client
 	router.HandleFunc("/api/admin/clients/{idClient}/withdrawal", handlers.HistorialWithdrawal).Methods("GET")
 
-	// -------------------Auctionnumber-------------------------------
-
-	// Add a auction number
-	router.HandleFunc("/api/admin/components/{idComponent}/auctionnumber", handlers.AddAuctionNumber).Methods("POST")
-	// To View all Auction Number of specify Racing Component
-	router.HandleFunc("/api/admin/components/{idComponent}/auctionnumber", handlers.GetAuctionNumbers).Methods("GET")
-	// Delete a auction number
-	router.HandleFunc("/api/admin/event/components/{idComponent}/auctionnumber/{idauctionnumber}", handlers.DeleteAuctionNumber).Methods("DELETE")
-
 	// -------------------Coin----------------------------------------
 
 	// To a specific Coin Client
