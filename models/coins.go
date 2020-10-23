@@ -95,6 +95,16 @@ func DeleteCoinsClient(Clientidentificationcard string) bool {
 	return true
 }
 
+// ExistClientinCoinsDB .
+func ExistClientinCoinsDB(clientIDCard string) bool {
+	tempClient := &Coins{}
+	err := GetDB().Table("coins").Where("ClientIdentificationcard = ?", clientIDCard).First(tempClient).Error
+	if err == gorm.ErrRecordNotFound {
+		return false
+	}
+	return true
+}
+
 // ---------------------------Validations------------------------------
 
 // ValidateCoins struct

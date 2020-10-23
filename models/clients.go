@@ -106,7 +106,7 @@ func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 		return resp
 	}
 
-	temp, err := existClient(idClient)
+	temp, err := ExistClientDB(idClient)
 	if err == gorm.ErrRecordNotFound {
 		return nil
 	}
@@ -138,7 +138,7 @@ func (client *Client) UpdateClient(idClient *string) map[string]interface{} {
 // UpdateStateClient client in DB
 func UpdateStateClient(idClient *string) map[string]interface{} {
 
-	temp, err := existClient(idClient)
+	temp, err := ExistClientDB(idClient)
 	if err == gorm.ErrRecordNotFound {
 		return nil
 	}
@@ -160,7 +160,7 @@ func UpdateStateClient(idClient *string) map[string]interface{} {
 // DeleteClient from DB  Delete client then delete All client deposits and client coin.
 func DeleteClient(idClient *string) bool {
 
-	temp, err := existClient(idClient)
+	temp, err := ExistClientDB(idClient)
 	if err != nil || err == gorm.ErrRecordNotFound {
 		return false
 	}
@@ -213,7 +213,7 @@ func (client *Client) ValidateClientParams(idClient *string) (map[string]interfa
 		return resp, ok
 	}
 
-	tempParam, err := existClient(idClient)
+	tempParam, err := ExistClientDB(idClient)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return u.Message(false, "Connection error. Please retry"), false
 	}
@@ -296,8 +296,23 @@ func (client *Client) validateEqualUserData() (*Client, *Client, *Client, map[st
 	return tempForm, tempSeudonimo, tempEmail, u.Message(false, "Requirement passed"), true
 }
 
-func existClient(idClient *string) (*Client, error) {
+// ExistClientDB .
+func ExistClientDB(idClient *string) (*Client, error) {
 	temp := &Client{}
 	err := GetDB().Table("clients").Where("id = ?", *idClient).First(temp).Error
+	return temp, err
+}
+
+// ExistClientIdentificationDB .
+func ExistClientIdentificationDB(clientIdentification string) (*Client, error) {
+	temp := &Client{}
+	err := GetDB().Table("clients").Where("Identificationcard = ?", clientIdentification).First(temp).Error
+	return temp, err
+}
+
+// ExistClientSeudonimonDB .
+func ExistClientSeudonimonDB(seudonimo string) (*Client, error) {
+	temp := &Client{}
+	err := GetDB().Table("clients").Where("seudonimo = ?", seudonimo).First(temp).Error
 	return temp, err
 }

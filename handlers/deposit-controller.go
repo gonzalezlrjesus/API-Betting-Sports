@@ -13,10 +13,10 @@ import (
 // AddDeposit to client
 var AddDeposit = func(w http.ResponseWriter, r *http.Request) {
 
-	deposit := &models.Deposit{}
 	vars := mux.Vars(r)
 	idClient := vars["idClient"]
 
+	deposit := &models.Deposit{}
 	err := json.NewDecoder(r.Body).Decode(deposit)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Error while decoding request body"), 400)
