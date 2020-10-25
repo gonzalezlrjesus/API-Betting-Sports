@@ -1,9 +1,10 @@
 package models
 
 import (
-	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 	"encoding/json"
 	"fmt"
+
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/jinzhu/gorm"
 )
@@ -30,8 +31,8 @@ func CreateTablas(idracing string, montoTotal int64) map[string]interface{} {
 	data := Racing{}
 	json.Unmarshal([]byte(s), &data)
 
-	// GetOneEventMonto event Params: idEvent uint
-	testGetEvent := GetOneEventMonto(data.Eventid)
+	// GetOneEvent event Params: idEvent uint
+	testGetEvent := GetOneEvent(data.Eventid)
 
 	jsonMessage3, _ := json.Marshal(testGetEvent["event"])
 	sw := string(jsonMessage3)

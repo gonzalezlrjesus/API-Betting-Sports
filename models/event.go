@@ -1,9 +1,11 @@
 package models
 
 import (
-	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
-	"fmt"
+	"os"
+	"strconv"
 	"time"
+
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/jinzhu/gorm"
 )
@@ -28,9 +30,12 @@ func (event *Event) CreateEvent() map[string]interface{} {
 		return resp
 	}
 
-	event.Auctionnumber = 3
-	event.TimebetweenAuctions = 5
-	event.Horsenotauction = "casa"
+	tempAucnumber, _ := strconv.ParseUint(os.Getenv("Auctionnumber"), 10, 64)
+	tempimebetweenAuctions, _ := strconv.ParseUint(os.Getenv("TimebetweenAuctions"), 10, 64)
+
+	event.Auctionnumber = uint(tempAucnumber)
+	event.TimebetweenAuctions = uint(tempimebetweenAuctions)
+	event.Horsenotauction = os.Getenv("Horsenotauction")
 	GetDB().Create(event)
 
 	response := u.Message(true, "Event add to system")
@@ -38,18 +43,15 @@ func (event *Event) CreateEvent() map[string]interface{} {
 	return response
 }
 
-// UpdateEvent in DB I MUST CORRECT IT, BECAUSE I UPDATE NEW DATA***
-func (event *Event) UpdateEvent(idEvent *string) map[string]interface{} {
+// UpdateEvent .
+func (event *Event) UpdateEvent(idEvent uint) map[string]interface{} {
 
 	if resp, ok := event.ValidateEventParams(idEvent); !ok {
 		return resp
 	}
 
-	temp := &Event{}
-
-	err := GetDB().Table("events").Where("id = ?", *idEvent).First(temp).Error
+	temp, err := existEventID(idEvent)
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println(err)
 		return nil
 	}
 
@@ -67,29 +69,9 @@ func (event *Event) UpdateEvent(idEvent *string) map[string]interface{} {
 }
 
 // GetOneEvent event
-func GetOneEvent(idEvent *string) map[string]interface{} {
-	temp := &Event{}
-
-	//check event specific in DB
-	err := GetDB().Table("events").Where("id = ?", *idEvent).First(temp).Error
+func GetOneEvent(idEvent uint) map[string]interface{} {
+	temp, err := existEventID(idEvent)
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println("Event : ", err)
-		return u.Message(true, "Event no exist")
-	}
-
-	response := u.Message(true, "Get Event")
-	response["event"] = temp
-	return response
-}
-
-// GetOneEventMonto event
-func GetOneEventMonto(idEvent uint) map[string]interface{} {
-	temp := &Event{}
-
-	//check event specific in DB
-	err := GetDB().Table("events").Where("id = ?", idEvent).First(temp).Error
-	if err == gorm.ErrRecordNotFound {
-		fmt.Println("Event : ", err)
 		return u.Message(true, "Event no exist")
 	}
 
@@ -105,7 +87,6 @@ func GetEvents() map[string]interface{} {
 
 	err := GetDB().Table("events").Order("dateevent").Find(&events).Error
 	if err != nil {
-		// fmt.Println(err)
 		return nil
 	}
 
@@ -116,19 +97,17 @@ func GetEvents() map[string]interface{} {
 }
 
 // DeleteEvent from DB
-func DeleteEvent(idEvent *string) bool {
-
-	temp := &Event{}
-	// Select Event
-	err := GetDB().Table("events").Where("id= ?", *idEvent).First(temp).Error
-
+func DeleteEvent(idEvent uint) bool {
+	temp, err := existEventID(idEvent)
 	if err != nil || err == gorm.ErrRecordNotFound {
 		return false
 	}
+
+	// DeleteRacings(idEvent)
 	DeleteRacings(temp.ID)
 	// Delete it
 	GetDB().Delete(temp)
-	// DeleteRacings(idEvent)
+
 	return true
 }
 
@@ -138,52 +117,53 @@ func DeleteEvent(idEvent *string) bool {
 func (event *Event) ValidateEvent() (map[string]interface{}, bool) {
 
 	if event.Dateevent.IsZero() {
-		return u.Message(false, "Date Event is empty"), false
+		return u.Message(false, "event date is empty"), false
 	}
 
-	// Data form
-	tempForm := &Event{}
-	errAux := GetDB().Table("events").Where("dateevent = ?", event.Dateevent).First(tempForm).Error
+	tempForm, errAux := existEventDate(event.Dateevent)
 	if errAux != nil && errAux != gorm.ErrRecordNotFound {
 		return u.Message(false, "Connection error. Please retry"), false
 	}
+
 	if !tempForm.Dateevent.IsZero() {
-		return u.Message(false, "there is event with this Dateevent"), false
+		return u.Message(false, "there is event with this event date"), false
 	}
 
 	return u.Message(false, "Requirement passed"), true
 }
 
 // ValidateEventParams struct Params for Update Event
-func (event *Event) ValidateEventParams(idEvent *string) (map[string]interface{}, bool) {
+func (event *Event) ValidateEventParams(idEvent uint) (map[string]interface{}, bool) {
 
 	if event.Dateevent.IsZero() {
 		return u.Message(false, "Date Event is empty"), false
 	}
 
-	tempIDevent := &Event{}
-
-	// Search idEvent in DB
-	erridEvent := GetDB().Table("events").Where("id = ?", *idEvent).First(tempIDevent).Error
-	if erridEvent == gorm.ErrRecordNotFound {
-		fmt.Println(erridEvent)
+	temp, err := existEventID(idEvent)
+	if err == gorm.ErrRecordNotFound {
 		return u.Message(false, "Not found ID Event Param"), false
 	}
 
-	if erridEvent == gorm.ErrRecordNotFound {
-		return u.Message(false, "Not found ID Event Param"), false
-	}
-
-	// Data form
-	tempForm := &Event{}
-	errAux := GetDB().Table("events").Where("dateevent = ?", event.Dateevent).First(tempForm).Error
+	tempForm, errAux := existEventDate(event.Dateevent)
 	if errAux != nil && errAux != gorm.ErrRecordNotFound {
 		return u.Message(false, "Connection error. Please retry"), false
 	}
 
-	if errAux != gorm.ErrRecordNotFound && tempForm.Dateevent != tempIDevent.Dateevent {
+	if errAux != gorm.ErrRecordNotFound && tempForm.Dateevent != temp.Dateevent {
 		return u.Message(false, "there is event with this DateEvent"), false
 	}
 
 	return u.Message(false, "Requirement passed"), true
+}
+
+func existEventID(idEvent uint) (*Event, error) {
+	tempEvent := &Event{}
+	err := GetDB().Table("events").Where("id = ?", idEvent).First(tempEvent).Error
+	return tempEvent, err
+}
+
+func existEventDate(eventDate time.Time) (*Event, error) {
+	tempEvent := &Event{}
+	err := GetDB().Table("events").Where("dateevent = ?", eventDate).First(tempEvent).Error
+	return tempEvent, err
 }

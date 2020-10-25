@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -16,14 +15,13 @@ import (
 var CreateEvent = func(w http.ResponseWriter, r *http.Request) {
 
 	event := &models.Event{}
-	err := json.NewDecoder(r.Body).Decode(event) //decode the request body into struct and failed if any error occur
-	fmt.Println("err:", err)
+	err := json.NewDecoder(r.Body).Decode(event)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
 	}
 
-	resp := event.CreateEvent() //Create client
+	resp := event.CreateEvent()
 	u.Respond(w, resp, 201)
 }
 
@@ -31,9 +29,9 @@ var CreateEvent = func(w http.ResponseWriter, r *http.Request) {
 var UpdateEvent = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idEvent := vars["idEvent"]
-	event := &models.Event{}
 
-	err := json.NewDecoder(r.Body).Decode(event) //decode the request body into struct and failed if any error occur
+	event := &models.Event{}
+	err := json.NewDecoder(r.Body).Decode(event)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
@@ -70,7 +68,7 @@ var GetSpecificEvent = func(w http.ResponseWriter, r *http.Request) {
 	idEvent := vars["idEvent"]
 
 	data := models.GetOneEvent(&idEvent)
-	resp := u.Message(true, "GetSpecificEvent Success")
+	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)
 }
