@@ -37,7 +37,7 @@ var UpdateEvent = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := event.UpdateEvent(&idEvent)
+	data := event.UpdateEvent(u.ConverStringToUint(idEvent))
 	resp := u.Message(true, "Success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)
@@ -48,7 +48,7 @@ var DeleteEvent = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idEvent := vars["idEvent"]
 
-	data := models.DeleteEvent(&idEvent)
+	data := models.DeleteEvent(u.ConverStringToUint(idEvent))
 	resp := u.Message(true, strconv.FormatBool(data))
 	u.Respond(w, resp, 200)
 }
@@ -67,7 +67,7 @@ var GetSpecificEvent = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idEvent := vars["idEvent"]
 
-	data := models.GetOneEvent(&idEvent)
+	data := models.GetOneEvent(u.ConverStringToUint(idEvent))
 	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)

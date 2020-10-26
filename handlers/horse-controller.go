@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,13 +11,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// ParamsID struct params
-type ParamsID struct {
-	idRacing string
-	idHorse  string
-}
-
-// CreateHorse add a new Horse to db
+// CreateHorse add new Horses to db
 var CreateHorse = func(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
@@ -30,27 +23,24 @@ var CreateHorse = func(w http.ResponseWriter, r *http.Request) {
 		u.Respond(w, u.Message(false, "Error while decoding request body"), 400)
 		return
 	}
-	tempUint64, _ := strconv.ParseUint(idRacing, 10, 32)
-	resp := models.CreateHorseModel(newsList, uint(tempUint64))
+
+	resp := models.CreateHorses(newsList, u.ConverStringToUint(idRacing))
 	u.Respond(w, resp, 201)
 }
 
 // UpdateHorse Horse data
 var UpdateHorse = func(w http.ResponseWriter, r *http.Request) {
-	params := &ParamsID{}
 	vars := mux.Vars(r)
-	params.idRacing = vars["idRacing"]
-	params.idHorse = vars["idHorse"]
+	idRacing := vars["idRacing"]
 
 	horse := &models.Horse{}
-
-	err := json.NewDecoder(r.Body).Decode(horse) //decode the request body into struct and failed if any error occur
+	err := json.NewDecoder(r.Body).Decode(horse)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Invalid request"), 400)
 		return
 	}
 
-	data := horse.UpdateHorse(&params.idRacing, &params.idHorse)
+	data := horse.UpdateHorse(u.ConverStringToUint(idRacing), vars["idHorse"])
 	resp := u.Message(true, "Success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)
@@ -58,12 +48,10 @@ var UpdateHorse = func(w http.ResponseWriter, r *http.Request) {
 
 // DeleteHorse Delete Horse
 var DeleteHorse = func(w http.ResponseWriter, r *http.Request) {
-	params := &ParamsID{}
 	vars := mux.Vars(r)
-	params.idRacing = vars["idRacing"]
-	params.idHorse = vars["idHorse"]
-
-	data := models.DeleteHorse(&params.idRacing, &params.idHorse)
+	idRacing := vars["idRacing"]
+	idHorse := vars["idHorse"]
+	data := models.DeleteHorse(u.ConverStringToUint(idRacing), u.ConverStringToUint(idHorse))
 	resp := u.Message(true, strconv.FormatBool(data))
 	u.Respond(w, resp, 200)
 }
@@ -71,24 +59,20 @@ var DeleteHorse = func(w http.ResponseWriter, r *http.Request) {
 // GetHorses list Horses
 var GetHorses = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	idRacing := vars["idRacing"]
 
-	data := models.GetHorses(&idRacing)
+	data := models.GetHorses(vars["idRacing"])
 	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)
 }
 
-// WithdrawHorseBefore Withdraw Horse Before auction
+// WithdrawHorseBefore Horse Before auction
 var WithdrawHorseBefore = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idHorse := vars["idHorse"]
 	idRacing := vars["idRacing"]
-	fmt.Println(idRacing, idHorse)
-	tempUint64, _ := strconv.ParseUint(idHorse, 10, 32)
-	tempRacing, _ := strconv.ParseUint(idRacing, 10, 32)
 
-	data := models.WithdrawHorse(uint(tempUint64), uint(tempRacing))
+	data := models.WithdrawHorse(u.ConverStringToUint(idHorse), u.ConverStringToUint(idRacing))
 	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)

@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 )
 
 // Message .
@@ -53,4 +54,10 @@ func Respond(w http.ResponseWriter, data map[string]interface{}, status uint) {
 
 	data["status"] = status
 	json.NewEncoder(w).Encode(data)
+}
+
+// ConverStringToUint .
+func ConverStringToUint(text string) uint {
+	temp, _ := strconv.ParseUint(text, 10, 32)
+	return uint(temp)
 }

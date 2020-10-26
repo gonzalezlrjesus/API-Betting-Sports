@@ -303,3 +303,10 @@ func ValidateEventRacingParams(idEvent *uint) (map[string]interface{}, bool) {
 
 	return u.Message(false, "Requirement passed"), true
 }
+
+// ExistRaceID .
+func ExistRaceID(raceID uint) (*Racing, error) {
+	temp := &Racing{}
+	err := GetDB().Table("racings").Where("id = ?", raceID).First(temp).Error
+	return temp, err
+}
