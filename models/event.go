@@ -50,7 +50,7 @@ func (event *Event) UpdateEvent(idEvent uint) map[string]interface{} {
 		return resp
 	}
 
-	temp, err := existEventID(idEvent)
+	temp, err := ExistEventID(idEvent)
 	if err == gorm.ErrRecordNotFound {
 		return nil
 	}
@@ -70,7 +70,7 @@ func (event *Event) UpdateEvent(idEvent uint) map[string]interface{} {
 
 // GetOneEvent event
 func GetOneEvent(idEvent uint) map[string]interface{} {
-	temp, err := existEventID(idEvent)
+	temp, err := ExistEventID(idEvent)
 	if err == gorm.ErrRecordNotFound {
 		return u.Message(true, "Event no exist")
 	}
@@ -98,13 +98,13 @@ func GetEvents() map[string]interface{} {
 
 // DeleteEvent from DB
 func DeleteEvent(idEvent uint) bool {
-	temp, err := existEventID(idEvent)
+	temp, err := ExistEventID(idEvent)
 	if err != nil || err == gorm.ErrRecordNotFound {
 		return false
 	}
 
-	// DeleteRacings(idEvent)
-	DeleteRacings(temp.ID)
+	// DeleteAllRacesByEventID(idEvent)
+	DeleteAllRacesByEventID(temp.ID)
 	// Delete it
 	GetDB().Delete(temp)
 
@@ -139,7 +139,7 @@ func (event *Event) ValidateEventParams(idEvent uint) (map[string]interface{}, b
 		return u.Message(false, "Date Event is empty"), false
 	}
 
-	temp, err := existEventID(idEvent)
+	temp, err := ExistEventID(idEvent)
 	if err == gorm.ErrRecordNotFound {
 		return u.Message(false, "Not found ID Event Param"), false
 	}
@@ -156,7 +156,8 @@ func (event *Event) ValidateEventParams(idEvent uint) (map[string]interface{}, b
 	return u.Message(false, "Requirement passed"), true
 }
 
-func existEventID(idEvent uint) (*Event, error) {
+// ExistEventID .
+func ExistEventID(idEvent uint) (*Event, error) {
 	tempEvent := &Event{}
 	err := GetDB().Table("events").Where("id = ?", idEvent).First(tempEvent).Error
 	return tempEvent, err

@@ -1,13 +1,10 @@
 package models
 
 import (
-	"fmt"
 	"math"
-	"strconv"
 
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
-	// "reflect"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -22,93 +19,79 @@ type Racing struct {
 	Auctiontime          time.Time `json:"auctiontime"`
 	Alerttime            time.Time `json:"alerttime"`
 	Stateracing          string    `json:"stateracing"`
-	Idcaballoganador     uint      `json:"idcaballoganador"`
+	Idcaballoganador     int       `json:"idcaballoganador"`
 	Nombrecaballoganador string    `json:"nombrecaballoganador"`
 }
 
-// ListRacings struct test
-type ListRacings struct {
-	Arrayracing []Racing
-}
+// CreateRaces .
+func CreateRaces(racesList []Racing, idEvent uint) map[string]interface{} {
 
-// CreateRacingModel db
-func CreateRacingModel(Arrayracing []Racing, idEvent uint) map[string]interface{} {
-	for i := range Arrayracing {
-		Arrayracing[i].Eventid = idEvent
-		if resp, ok := Arrayracing[i].ValidateRacing(); !ok {
-			return resp
-		}
+	_, err := ExistEventID(idEvent)
+	if err == gorm.ErrRecordNotFound {
+		return u.Message(false, "Event exist no in DB")
+	}
 
-		err := GetDB().Create(&Arrayracing[i]).Error
-		fmt.Println("err:, ", err)
+	for i := range racesList {
+		racesList[i].Eventid = idEvent
+		GetDB().Create(&racesList[i])
 	}
 
 	response := u.Message(true, "Racings has been created")
-	response["Arrayracing"] = Arrayracing
+	response["races-list"] = racesList
 	return response
 }
 
-// UpdateRacingModel in DB
-func UpdateRacingModel(Arrayracing []Racing, idEvent uint) map[string]interface{} {
+// UpdateRaces .
+func UpdateRaces(Arrayracing []Racing, idEvent uint) map[string]interface{} {
 
-	if resp, ok := ValidateEventRacingParams(&idEvent); !ok {
-		return resp
+	_, err := ExistEventID(idEvent)
+	if err == gorm.ErrRecordNotFound {
+		return u.Message(false, "Event exist no in DB")
 	}
 
 	for i := range Arrayracing {
-
-		temp := &Racing{}
-		err := GetDB().Table("racings").Where("id = ?", Arrayracing[i].ID).First(temp).Error
+		temp, err := ExistRaceID(Arrayracing[i].ID)
 		if err == gorm.ErrRecordNotFound {
-			fmt.Println(err)
 			return nil
 		}
-		temp = &Arrayracing[i]
 
-		err = GetDB().Save(&temp).Error
-		fmt.Println("err:, ", err)
+		temp = &Arrayracing[i]
+		GetDB().Save(&temp)
 	}
 
 	response := u.Message(true, "Racings has been updated")
 	return response
-
 }
 
-// CloseRacing in DB
-func CloseRacing(idRacing string) map[string]interface{} {
-	tempUint64, _ := strconv.ParseUint(idRacing, 10, 32)
+// CloseRacing .
+func CloseRacing(idRacing uint) map[string]interface{} {
 
-	temp := &Racing{}
-	err := GetDB().Table("racings").Where("id = ?", uint(tempUint64)).First(temp).Error
+	temp, err := ExistRaceID(idRacing)
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println(err)
 		return nil
 	}
-	temp.Stateracing = "CLOSED"
 
-	err = GetDB().Save(&temp).Error
-	fmt.Println("err:, ", err)
+	temp.Stateracing = "CLOSED"
+	GetDB().Save(&temp)
 
 	response := u.Message(true, "Racings has become to closed")
 	return response
-
 }
 
 // TimeisEqualStartTime in DB
-func TimeisEqualStartTime(idRacing string) bool {
-	tempUint64, _ := strconv.ParseUint(idRacing, 10, 32)
-	// fmt.Println("TimeisEqualStartTime id", tempUint64)
-	temp := &Racing{}
-	err := GetDB().Table("racings").Where("id = ?", uint(tempUint64)).First(temp).Error
+func TimeisEqualStartTime(idRacing uint) bool {
+
+	temp, err := ExistRaceID(idRacing)
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println(err)
 		return false
 	}
-	hs := temp.Starttime.Sub(time.Now()).Hours()
 
+	// Hours
+	hs := temp.Starttime.Sub(time.Now()).Hours()
+	// Minutes
 	hs, mf := math.Modf(hs)
 	ms := mf * 60
-
+	// Seconds
 	ms, sf := math.Modf(ms)
 	ss := sf * 60
 
@@ -116,154 +99,119 @@ func TimeisEqualStartTime(idRacing string) bool {
 	// fmt.Println(ms == 0, "minutes == 0")
 	// fmt.Println(int(ss) == 0, "ss == 0")
 
-	response := false
 	if ms == 0 && int(ss) == 0 {
-		temp.Stateracing = "CLOSED"
-
-		err = GetDB().Save(&temp).Error
-		response := true
-		return response
+		CloseRacing(idRacing)
+		return true
 	}
-	return response
-
+	return false
 }
 
-// GetOneRacing Racing
-// func GetOneRacing(idEvent, idRacing *string) map[string]interface{} {
-func GetOneRacing(idRacing *string) map[string]interface{} {
-	temp := &Racing{}
+// GetRace .
+func GetRace(idRacing uint) map[string]interface{} {
 
-	//check racing specific in DB
-	// err := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, *idEvent).First(temp).Error
-	err := GetDB().Table("racings").Where("id = ?", *idRacing).First(temp).Error
+	temp, err := ExistRaceID(idRacing)
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println("Racing : ", err)
-		return u.Message(true, "Racing no exist")
+		return u.Message(true, "Race not exist")
 	}
 
-	response := u.Message(true, "Get Racing")
+	response := u.Message(true, "Get Race")
 	response["racing"] = temp
 	return response
 }
 
-// FindRacingWithinEvent find
-func FindRacingWithinEvent(idEvent *string, idRacing *string) map[string]interface{} {
-	temp := &Racing{}
+// FindRaceByEventID find
+func FindRaceByEventID(idEvent, idRacing uint) map[string]interface{} {
 
-	//check racing specific in DB
-	err := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, *idEvent).First(temp).Error
+	temp, err := searchRacingByIDandEventID(idRacing, idEvent)
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println("Racing : ", err)
-		return u.Message(true, "Racing no exist")
+		return u.Message(true, "Race not exist")
 	}
 
-	response := u.Message(true, "Get Racing")
+	response := u.Message(true, "Get Race")
 	response["racing"] = temp
 	response["time"] = time.Now()
 	return response
 }
 
 // RepartirGanancias find
-func RepartirGanancias(idRacing string, idHorse int) map[string]interface{} {
-	// REMATES
-	temp := &Remates{}
-	err := GetDB().Table("remates").Where("idracing = ? AND idhorse = ?", idRacing, idHorse).Find(temp).Error
+func RepartirGanancias(idRace uint, idHorse int) map[string]interface{} {
+	// RACE
+	tempRacing, err := ExistRaceID(idRace)
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println("Remates : ", err)
-		return u.Message(true, "Remates no exist")
+		return u.Message(true, "Race not exist")
+	}
+
+	// REMATES
+	tempREMATES, err := SearchRemateByRaceIDAndHorseID(idRace, idHorse)
+	if err == gorm.ErrRecordNotFound {
+		return u.Message(true, "Remate not exist")
 	}
 
 	// TABLAS
-	tempTablas := &Tablas{}
-	errtablas := GetDB().Table("tablas").Where("idracing = ?", idRacing).Find(tempTablas).Error
-	if errtablas == gorm.ErrRecordNotFound {
-		fmt.Println("tablas : ", errtablas)
-		return u.Message(true, "tablas no exist")
+	tempTablas, err := SearchTablaByRaceID(idRace)
+	if err == gorm.ErrRecordNotFound {
+		return u.Message(true, "Tabla not exist")
 	}
 
-	AddGananciaClient(temp.Seudonimo, tempTablas.Montoganador, "Ganancia", tempTablas.ID)
+	AddGananciaClient(tempREMATES.Seudonimo, tempTablas.Montoganador, "Ganancia", tempTablas.ID)
 	AddGananciaClient("CASA", tempTablas.Montocasa, "CASA", tempTablas.ID)
 
 	tempTablas.UpdateStateTabla()
 
-	tempRacing := &Racing{}
-	tempUint64, _ := strconv.ParseUint(idRacing, 10, 32)
-	//check racing specific in DB
-	errRacing := GetDB().Table("racings").Where("id= ?", uint(tempUint64)).First(tempRacing).Error
-	if errRacing == gorm.ErrRecordNotFound {
-		fmt.Println("Racing : ", errRacing)
-		return u.Message(true, "Racing no exist")
-	}
-	tempRacing.Idcaballoganador = uint(idHorse)
+	tempRacing.Idcaballoganador = idHorse
 	GetDB().Save(&tempRacing)
 	response := u.Message(true, "Ganancias Repartidas")
 	return response
 }
 
-// GetRacings all Racings of table Racings
-func GetRacings(idEvent *string) []*Racing {
+// GetRacings all Racings by eventID
+func GetRacings(idEvent uint) map[string]interface{} {
 
-	racings := make([]*Racing, 0)
-
-	err := GetDB().Table("racings").Where("eventid = ?", *idEvent).Find(&racings).Error
+	racings, err := searchAllRacesByEventID(idEvent)
 	if err != nil {
-		fmt.Println(err)
 		return nil
 	}
 
-	return racings
+	response := u.Message(true, "Get all races")
+	response["races"] = racings
+	return response
 }
 
 // DeleteRacing from DB
-func DeleteRacing(idEvent, idRacing *string) bool {
+func DeleteRacing(idEvent, idRacing uint) bool {
 
-	tempEvent := &Event{}
-	// Search Event
-	errEvent := GetDB().Table("events").Where("id= ?", *idEvent).First(tempEvent).Error
-
-	if errEvent != nil || errEvent == gorm.ErrRecordNotFound {
+	_, err := ExistEventID(idEvent)
+	if err == gorm.ErrRecordNotFound {
 		return false
 	}
 
-	tempRacing := &Racing{}
-	// Search Racing
-	errRacing := GetDB().Table("racings").Where("id= ? AND eventid = ?", *idRacing, idEvent).First(tempRacing).Error
-
-	if errRacing != nil || errRacing == gorm.ErrRecordNotFound {
+	temp, err := searchRacingByIDandEventID(idRacing, idEvent)
+	if err == gorm.ErrRecordNotFound {
 		return false
 	}
 
-	// Delete it
-	GetDB().Delete(tempRacing)
-	DeleteAllHorses(tempRacing.ID)
+	DeleteAllHorses(temp.ID)
+	GetDB().Delete(temp)
+
 	return true
 }
 
-// DeleteRacings delete all racings
-func DeleteRacings(idComponent uint) bool {
+// DeleteAllRacesByEventID .
+func DeleteAllRacesByEventID(eventID uint) bool {
 
-	racings := &[]Racing{}
-
-	errRacings := GetDB().Table("racings").Where("eventid = ?", idComponent).Find(&racings).Error
-	if errRacings != nil {
-		fmt.Println(errRacings)
+	racings, err := searchAllRacesByEventID(eventID)
+	if err != nil {
 		return false
+	}
+
+	for _, race := range *racings {
+		DeleteAllHorses(race.ID)
 	}
 
 	tempDelete := &[]Racing{}
-
-	// idEvent := *idComponent
-	// tempUint64, _ := strconv.ParseUint(idEvent, 10, 32)
-
-	// delete all racings
-	err := GetDB().Table("racings").Where("eventid = ?", idComponent).Delete(tempDelete).Error
+	err = GetDB().Table("racings").Where("eventid = ?", eventID).Delete(tempDelete).Error
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println("Racingcomponentid  : ", err)
 		return false
-	}
-	fmt.Println("Error  : ", err)
-	for _, JustRace := range *racings {
-		DeleteAllHorses(JustRace.ID)
 	}
 
 	return true
@@ -271,42 +219,21 @@ func DeleteRacings(idComponent uint) bool {
 
 // ---------------------------Validations------------------------------
 
-// ValidateRacing struct that Front-End to Back-End
-func (racing *Racing) ValidateRacing() (map[string]interface{}, bool) {
-
-	// if racing.Hipodromo == "" {
-	// 	return u.Message(false, "Hipodromo is required"), false
-	// }
-
-	temp := &Racing{}
-	//check Event in DB
-	err := GetDB().Table("events").Where("id = ?", racing.Eventid).First(temp).Error
-	if err == gorm.ErrRecordNotFound {
-		fmt.Println("Event", err)
-		return u.Message(false, "Event exist no in DB"), false
-	}
-
-	return u.Message(false, "Requirement passed"), true
-}
-
-// ValidateEventRacingParams struct Params for Update Racing
-func ValidateEventRacingParams(idEvent *uint) (map[string]interface{}, bool) {
-
-	tempIDevent := &Event{}
-
-	// Search idEvent in DB
-	erridEvent := GetDB().Table("events").Where("id = ?", *idEvent).First(tempIDevent).Error
-	if erridEvent == gorm.ErrRecordNotFound {
-		fmt.Println(erridEvent)
-		return u.Message(false, "Not found ID Event Param"), false
-	}
-
-	return u.Message(false, "Requirement passed"), true
-}
-
 // ExistRaceID .
 func ExistRaceID(raceID uint) (*Racing, error) {
 	temp := &Racing{}
-	err := GetDB().Table("racings").Where("id = ?", raceID).First(temp).Error
+	err := GetDB().Table("racings").Where("id = ?", raceID).First(&Racing{}).Error
+	return temp, err
+}
+
+func searchRacingByIDandEventID(idRacing, idEvent uint) (*Racing, error) {
+	temp := &Racing{}
+	err := GetDB().Table("racings").Where("id = ? AND eventid = ?", idRacing, idEvent).First(&Racing{}).Error
+	return temp, err
+}
+
+func searchAllRacesByEventID(eventID uint) (*[]Racing, error) {
+	temp := &[]Racing{}
+	err := GetDB().Table("racings").Where("eventid = ?", eventID).Find(&[]Racing{}).Error
 	return temp, err
 }

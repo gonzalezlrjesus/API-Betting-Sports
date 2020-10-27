@@ -12,7 +12,7 @@ import (
 // Tablas struct
 type Tablas struct {
 	gorm.Model
-	Idracing         string `json:"idracing"`
+	Idracing         uint   `json:"idracing"`
 	Montototal       int64  `json:"montototal"`
 	Montocasa        int64  `json:"montocasa"`
 	Montoganador     int64  `json:"montoganador"`
@@ -22,9 +22,9 @@ type Tablas struct {
 }
 
 // CreateTablas Tablas db
-func CreateTablas(idracing string, montoTotal int64) map[string]interface{} {
+func CreateTablas(idracing uint, montoTotal int64) map[string]interface{} {
 
-	testGetRacing := GetOneRacing(&idracing)
+	testGetRacing := GetRace(idracing)
 	jsonMessage2, _ := json.Marshal(testGetRacing["racing"])
 	fmt.Println(string(jsonMessage2))
 	s := string(jsonMessage2)
@@ -85,4 +85,11 @@ func (tabla *Tablas) UpdateStateTabla() map[string]interface{} {
 	response := u.Message(true, "Tabla has been updated")
 	response["tabla"] = tabla
 	return response
+}
+
+// SearchTablaByRaceID .
+func SearchTablaByRaceID(idRace uint) (*Tablas, error) {
+	temp := &Tablas{}
+	err := GetDB().Table("tablas").Where("idracing = ?", idRace).Find(temp).Error
+	return temp, err
 }

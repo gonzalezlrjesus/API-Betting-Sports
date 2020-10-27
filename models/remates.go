@@ -1,9 +1,10 @@
 package models
 
 import (
-	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 	"fmt"
 	"time"
+
+	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 	"github.com/jinzhu/gorm"
 )
 
@@ -14,7 +15,7 @@ import (
 // Remates struct
 type Remates struct {
 	gorm.Model
-	Idracing    string `json:"idracing"`
+	Idracing    uint   `json:"idracing"`
 	Idhorse     int    `json:"idhorse"`
 	Numberhorse int    `json:"numberhorse"`
 	Seudonimo   string `json:"seudonimo"`
@@ -23,7 +24,7 @@ type Remates struct {
 }
 
 // CreateRemates Remates db
-func CreateRemates(idracing string, idhorse int, numberhorse int, seudonimo string, amount int64, horsename string) map[string]interface{} {
+func CreateRemates(idracing uint, idhorse int, numberhorse int, seudonimo string, amount int64, horsename string) map[string]interface{} {
 	remateGanador := &Remates{Idracing: idracing, Idhorse: idhorse, Numberhorse: numberhorse, Seudonimo: seudonimo, Amount: amount, Horsename: horsename}
 
 	GetDB().Create(remateGanador)
@@ -53,4 +54,11 @@ func GetRemates(idracing *string) map[string]interface{} {
 	response := u.Message(true, "EMPTY")
 	response["time"] = time.Now()
 	return response
+}
+
+// SearchRemateByRaceIDAndHorseID .
+func SearchRemateByRaceIDAndHorseID(idRacing uint, idHorse int) (*Remates, error) {
+	temp := &Remates{}
+	err := GetDB().Table("remates").Where("idracing = ? AND idhorse = ?", idRacing, idHorse).Find(temp).Error
+	return temp, err
 }

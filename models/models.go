@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/jinzhu/gorm"
@@ -16,7 +17,7 @@ func init() {
 
 	e := godotenv.Load()
 	if e != nil {
-		fmt.Print(e)
+		log.Print(e)
 	}
 
 	username := os.Getenv("db_user")
@@ -28,13 +29,23 @@ func init() {
 
 	conn, err := gorm.Open("postgres", dbURI)
 	if err != nil {
-		// fmt.Print(err)
+		log.Print(err)
 	}
+
 	db = conn
-	conn.Debug().AutoMigrate(&Admin{}, &Client{}, &Coins{}, &Deposit{}, &Event{}, &Racing{}, &Horse{}, &Remates{}, &Tablas{}, &Retiro{})
+	conn.Debug().AutoMigrate(&Admin{},
+		&Client{},
+		&Coins{},
+		&Deposit{},
+		&Event{},
+		&Racing{},
+		&Horse{},
+		&Remates{},
+		&Tablas{},
+		&Retiro{})
 }
 
-// GetDB gorm
+// GetDB .
 func GetDB() *gorm.DB {
 	return db
 }

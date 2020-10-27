@@ -61,3 +61,9 @@ func ConverStringToUint(text string) uint {
 	temp, _ := strconv.ParseUint(text, 10, 32)
 	return uint(temp)
 }
+
+// ConverStringToInt .
+func ConverStringToInt(text string) int {
+	temp, _ := strconv.ParseInt(text, 10, 32)
+	return int(temp)
+}

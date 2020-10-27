@@ -56,7 +56,7 @@ var Manager = ClientManager{
 var myInt8 int8 = 16
 var arrayRemates []MatrixRemates
 var actualPosition MatrixRemates
-var idCarrera string
+var idCarrera uint
 var finalizacion string
 var montoTotal int64
 
@@ -91,13 +91,13 @@ func (manager *ClientManager) Start() {
 			}
 		case <-time.After(1 * time.Second):
 
-			if idCarrera != "" {
+			if idCarrera != 0 {
 				// fmt.Println("IF ENTRO", reflect.TypeOf(idCarrera))
 				if TimeisEqualStartTime(idCarrera) {
 					// fmt.Println("APROBADO CERRADO", reflect.TypeOf(idCarrera))
 					arrayRemates = nil
 					myInt8 = 11
-					idCarrera = ""
+					idCarrera = uint(0)
 				}
 			}
 
@@ -163,7 +163,7 @@ func (c *Clientmodel) Read() {
 		errjson := json.Unmarshal([]byte(s), &parsedData2)
 		fmt.Println("errjson: *** ", errjson)
 
-		idCarrera = parsedData2["idcarrera"].(string)
+		idCarrera = parsedData2["idcarrera"].(uint)
 		finalizacion = parsedData2["finalizo"].(string)
 
 		matrixfloat64 := int64(parsedData2["matrix"].(float64))
@@ -232,7 +232,7 @@ func (c *Clientmodel) Read() {
 					CreateTablas(idCarrera, montoTotal)
 					arrayRemates = nil
 					CloseRacing(idCarrera)
-					idCarrera = ""
+					idCarrera = uint(0)
 					montoTotal = 0
 				}
 
@@ -266,7 +266,7 @@ func (c *Clientmodel) Read() {
 					CreateTablas(idCarrera, montoTotal)
 					arrayRemates = nil
 					CloseRacing(idCarrera)
-					idCarrera = ""
+					idCarrera = uint(0)
 					montoTotal = 0
 				}
 
