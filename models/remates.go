@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
@@ -23,9 +22,15 @@ type Remates struct {
 	Horsename   string `json:"horsename"`
 }
 
-// CreateRemates Remates db
+// CreateRemates .
 func CreateRemates(idracing uint, idhorse int, numberhorse int, seudonimo string, amount int64, horsename string) map[string]interface{} {
-	remateGanador := &Remates{Idracing: idracing, Idhorse: idhorse, Numberhorse: numberhorse, Seudonimo: seudonimo, Amount: amount, Horsename: horsename}
+	remateGanador := &Remates{
+		Idracing:    idracing,
+		Idhorse:     idhorse,
+		Numberhorse: numberhorse,
+		Seudonimo:   seudonimo,
+		Amount:      amount,
+		Horsename:   horsename}
 
 	GetDB().Create(remateGanador)
 
@@ -34,24 +39,16 @@ func CreateRemates(idracing uint, idhorse int, numberhorse int, seudonimo string
 	return response
 }
 
-// GetRemates Remates db
-func GetRemates(idracing *string) map[string]interface{} {
+// GetRemates .
+func GetRemates(idracing uint) map[string]interface{} {
 
-	remates := make([]*Remates, 0)
-
-	err := GetDB().Table("remates").Where("idracing = ?", *idracing).Find(&remates).Error
+	remates, err := searchRematesByRacingID(idracing)
 	if err != nil {
-		fmt.Println(err)
 		return nil
 	}
 
-	if len(remates) > 0 {
-		response := u.Message(true, "Remates added")
-		response["remates"] = remates
-		response["time"] = time.Now()
-		return response
-	}
-	response := u.Message(true, "EMPTY")
+	response := u.Message(true, "Remates")
+	response["remates"] = remates
 	response["time"] = time.Now()
 	return response
 }
@@ -61,4 +58,10 @@ func SearchRemateByRaceIDAndHorseID(idRacing uint, idHorse int) (*Remates, error
 	temp := &Remates{}
 	err := GetDB().Table("remates").Where("idracing = ? AND idhorse = ?", idRacing, idHorse).Find(temp).Error
 	return temp, err
+}
+
+func searchRematesByRacingID(idracing uint) ([]*Remates, error) {
+	remates := make([]*Remates, 0)
+	err := GetDB().Table("remates").Where("idracing = ?", idracing).Find(&remates).Error
+	return remates, err
 }

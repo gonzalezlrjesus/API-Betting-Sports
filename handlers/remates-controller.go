@@ -9,24 +9,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// RematesRacing racings
-var RematesRacing = func(w http.ResponseWriter, r *http.Request) {
-
-	vars := mux.Vars(r)
-	idRacing := vars["idRacing"]
-
-	data := models.GetRemates(&idRacing)
-	resp := u.Message(true, "success")
-	resp["data"] = data
-	u.Respond(w, resp, 200)
-}
-
-// GetRematesFor list Racings
+// GetRematesFor by racingID
 var GetRematesFor = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idRacing := vars["idRacing"]
 
-	data := models.GetRemates(&idRacing)
+	data := models.GetRemates(u.ConverStringToUint(idRacing))
 	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)
