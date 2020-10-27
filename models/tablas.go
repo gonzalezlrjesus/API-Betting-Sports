@@ -1,9 +1,6 @@
 package models
 
 import (
-	"encoding/json"
-	"fmt"
-
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/jinzhu/gorm"
@@ -21,25 +18,13 @@ type Tablas struct {
 	Estado           string `json:"estado"`
 }
 
-// CreateTablas Tablas db
+// CreateTablas .
 func CreateTablas(idracing uint, montoTotal int64) map[string]interface{} {
 
-	testGetRacing := GetRace(idracing)
-	jsonMessage2, _ := json.Marshal(testGetRacing["racing"])
-	fmt.Println(string(jsonMessage2))
-	s := string(jsonMessage2)
-	data := Racing{}
-	json.Unmarshal([]byte(s), &data)
+	race, _ := ExistRaceID(idracing)
+	event, _ := ExistEventID(race.Eventid)
 
-	// GetOneEvent event Params: idEvent uint
-	testGetEvent := GetOneEvent(data.Eventid)
-
-	jsonMessage3, _ := json.Marshal(testGetEvent["event"])
-	sw := string(jsonMessage3)
-	dataEvent := Event{}
-	json.Unmarshal([]byte(sw), &dataEvent)
-
-	var gananciaCasa int64 = (int64(dataEvent.Profitpercentage) * montoTotal) / 100
+	var gananciaCasa int64 = (int64(event.Profitpercentage) * montoTotal) / 100
 	var gananciaGanador int64 = montoTotal - gananciaCasa
 	tablaAlmacenar := &Tablas{
 		Idracing:         idracing,
@@ -47,7 +32,7 @@ func CreateTablas(idracing uint, montoTotal int64) map[string]interface{} {
 		Montocasa:        gananciaCasa,
 		Montoganador:     gananciaGanador,
 		Posiciontabla:    1,
-		Porcentajeevento: dataEvent.Profitpercentage,
+		Porcentajeevento: event.Profitpercentage,
 		Estado:           "ESPERANDO",
 	}
 
@@ -58,23 +43,16 @@ func CreateTablas(idracing uint, montoTotal int64) map[string]interface{} {
 	return response
 }
 
-// GetTablas Tablas db
-func GetTablas(idracing *string) map[string]interface{} {
+// GetTablas .
+func GetTablas(idracing uint) map[string]interface{} {
 
-	tablas := make([]*Tablas, 0)
-
-	err := GetDB().Table("tablas").Where("idracing = ?", *idracing).Find(&tablas).Error
+	tablas, err := searchAllTablasByRaceID(idracing)
 	if err != nil {
-		fmt.Println(err)
 		return nil
 	}
 
-	if len(tablas) > 0 {
-		response := u.Message(true, "Tablas")
-		response["tablas"] = tablas
-		return response
-	}
-	response := u.Message(true, "EMPTY")
+	response := u.Message(true, "Tablas")
+	response["tablas"] = tablas
 	return response
 }
 
@@ -92,4 +70,10 @@ func SearchTablaByRaceID(idRace uint) (*Tablas, error) {
 	temp := &Tablas{}
 	err := GetDB().Table("tablas").Where("idracing = ?", idRace).Find(temp).Error
 	return temp, err
+}
+
+func searchAllTablasByRaceID(idRace uint) ([]*Tablas, error) {
+	tablas := make([]*Tablas, 0)
+	err := GetDB().Table("tablas").Where("idracing = ?", idRace).Find(tablas).Error
+	return tablas, err
 }

@@ -25,7 +25,8 @@ func (deposit *Deposit) AddDepositClient() map[string]interface{} {
 	temp := &Coins{Clientidentificationcard: deposit.Clientidentificationcard}
 
 	//check client in Coins table DB
-	if !ExistClientinCoinsDB(temp.Clientidentificationcard) {
+	temp, err := ExistClientinCoinsDB(temp.Clientidentificationcard)
+	if err == gorm.ErrRecordNotFound {
 		return nil
 	}
 
@@ -53,7 +54,8 @@ func AddGananciaClient(seudonimo string, montoganado int64, formapago string, se
 	tempCoins := &Coins{Clientidentificationcard: depositGanador.Clientidentificationcard}
 
 	//check client in Coins table DB
-	if !ExistClientinCoinsDB(tempCoins.Clientidentificationcard) {
+	_, errCoins := ExistClientinCoinsDB(tempCoins.Clientidentificationcard)
+	if errCoins == gorm.ErrRecordNotFound {
 		return nil
 	}
 
@@ -67,9 +69,8 @@ func AddGananciaClient(seudonimo string, montoganado int64, formapago string, se
 // GetAllDepositsClient Client db
 func GetAllDepositsClient(idClient *string) map[string]interface{} {
 
-	temp := &[]Deposit{}
-
 	//check deposits ALL in DB
+	temp := &[]Deposit{}
 	err := GetDB().Table("deposits").Where("ClientIdentificationcard = ?", *idClient).Find(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil
@@ -83,9 +84,8 @@ func GetAllDepositsClient(idClient *string) map[string]interface{} {
 // UpdateIdentificationClientDeposit update  client ID in all deposits
 func UpdateIdentificationClientDeposit(Clientidentificationcard, newIdentification string) map[string]interface{} {
 
-	temp := &[]Deposit{}
-
 	//check client identificacion in deposit table ALL in DB
+	temp := &[]Deposit{}
 	err := GetDB().Table("deposits").Where("ClientIdentificationcard = ?", Clientidentificationcard).
 		Update("clientidentificationcard", newIdentification).Error
 	if err == gorm.ErrRecordNotFound {
@@ -100,9 +100,8 @@ func UpdateIdentificationClientDeposit(Clientidentificationcard, newIdentificati
 // DeleteDepositsClient delete all client deposits in database
 func DeleteDepositsClient(Clientidentificationcard string) bool {
 
-	temp := &[]Deposit{}
-
 	//check Client Deposits in DB
+	temp := &[]Deposit{}
 	err := GetDB().Table("deposits").Where("ClientIdentificationcard LIKE ?", Clientidentificationcard).
 		Delete(temp).Error
 	if err == gorm.ErrRecordNotFound {

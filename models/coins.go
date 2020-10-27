@@ -49,12 +49,9 @@ func (coins *Coins) DecreaseCoins(rematesAmount float64) map[string]interface{} 
 // UpdateIdentificationCoinClient client identification in coins table of DB
 func UpdateIdentificationCoinClient(Clientidentificationcard, newIdentification string) map[string]interface{} {
 
-	temp := &Coins{}
-
-	//check client exist
-	err := GetDB().Table("coins").Where("clientidentificationcard = ?", Clientidentificationcard).First(temp).Error
+	temp, err := ExistClientinCoinsDB(Clientidentificationcard)
 	if err == gorm.ErrRecordNotFound {
-		return u.Message(true, "client has NOT updated your coins")
+		return u.Message(true, "Client not exist")
 	}
 
 	temp.Clientidentificationcard = newIdentification
@@ -67,11 +64,9 @@ func UpdateIdentificationCoinClient(Clientidentificationcard, newIdentification 
 }
 
 // GetCoinsClient client
-func GetCoinsClient(idClient *string) map[string]interface{} {
-	temp := &Coins{}
+func GetCoinsClient(Clientidentificationcard string) map[string]interface{} {
 
-	//check client exist
-	err := GetDB().Table("coins").Where("clientidentificationcard = ?", *idClient).First(temp).Error
+	temp, err := ExistClientinCoinsDB(Clientidentificationcard)
 	if err == gorm.ErrRecordNotFound {
 		return u.Message(true, "Client not exist")
 	}
@@ -84,24 +79,13 @@ func GetCoinsClient(idClient *string) map[string]interface{} {
 // DeleteCoinsClient client deposit in database
 func DeleteCoinsClient(Clientidentificationcard string) bool {
 
-	temp := &[]Deposit{}
-
 	//check client exist and delete it
+	temp := &[]Deposit{}
 	err := GetDB().Table("coins").Where("clientidentificationcard LIKE ?", Clientidentificationcard).Delete(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		return false
 	}
 
-	return true
-}
-
-// ExistClientinCoinsDB .
-func ExistClientinCoinsDB(clientIDCard string) bool {
-	tempClient := &Coins{}
-	err := GetDB().Table("coins").Where("ClientIdentificationcard = ?", clientIDCard).First(tempClient).Error
-	if err == gorm.ErrRecordNotFound {
-		return false
-	}
 	return true
 }
 
@@ -115,4 +99,11 @@ func (coins *Coins) ValidateCoins() (map[string]interface{}, bool) {
 	}
 
 	return u.Message(false, "Requirement passed"), true
+}
+
+// ExistClientinCoinsDB .
+func ExistClientinCoinsDB(clientIDCard string) (*Coins, error) {
+	temp := &Coins{}
+	err := GetDB().Table("coins").Where("ClientIdentificationcard = ?", clientIDCard).First(temp).Error
+	return temp, err
 }

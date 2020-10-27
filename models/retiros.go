@@ -1,8 +1,6 @@
 package models
 
 import (
-	"fmt"
-
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
 
 	"github.com/jinzhu/gorm"
@@ -16,78 +14,65 @@ type Retiro struct {
 }
 
 // Dowithdrawal Client db
-func (retiro *Retiro) Dowithdrawal() map[string]interface{} {
-
-	if resp, ok := retiro.ValidateRetiro(); !ok {
+func (retiro *Retiro) Dowithdrawal(clientIDCard string) map[string]interface{} {
+	retiro.Clientidentificationcard = clientIDCard
+	if resp, ok := retiro.validateRetiro(); !ok {
 		return resp
 	}
 
-	GetDB().Create(retiro)
-	temp := &Coins{Clientidentificationcard: retiro.Clientidentificationcard}
-
-	//check client_Coins in DB
-	err := GetDB().Table("coins").Where("clientIdentificationcard = ?", temp.Clientidentificationcard).First(temp).Error
+	temp, err := ExistClientinCoinsDB(retiro.Clientidentificationcard)
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println("Client Coins : ", err)
 		return nil
 	}
 
+	GetDB().Create(retiro)
+
 	response := u.Message(true, "deposit has been created")
-	response["updateCoins"] = temp.DecreaseCoins(retiro.Amount)
+	response["update-coins"] = temp.DecreaseCoins(retiro.Amount)
 	response["withdrawal"] = retiro
 	return response
 }
 
-// GetAllWithdrawal Client db
-func GetAllWithdrawal(idClient *string) map[string]interface{} {
-
-	temp := &[]Deposit{}
+// GetAllWithdrawal Client
+func GetAllWithdrawal(clientIDCard *string) map[string]interface{} {
 
 	//check deposits ALL in DB
-	err := GetDB().Table("retiros").Where("clientidentificationcard = ?", *idClient).Find(temp).Error
+	temp := &[]Retiro{}
+	err := GetDB().Table("retiros").Where("clientidentificationcard = ?", *clientIDCard).Find(temp).Error
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println("Retiros: ", err)
 		return nil
 	}
 
 	response := u.Message(true, "Get all retiros")
-	response["allretiros"] = temp
+	response["all-retiros"] = temp
 	return response
 }
 
-// UpdateIdentificationClientRetiro update identificacionCard of client all record in table deposits of db
-func UpdateIdentificationClientRetiro(Clientidentificationcard, newIdentification string) map[string]interface{} {
+// UpdateIdentificationClientRetiro  all record in table retiros
+func UpdateIdentificationClientRetiro(clientIDCard, newIdentification string) map[string]interface{} {
 
 	temp := &[]Retiro{}
-
-	//check client identificacion in retiros table ALL in DB
-	err := GetDB().Table("retiros").Where("clientidentificationcard = ?", Clientidentificationcard).Update("clientidentificationcard", newIdentification).Error
-
+	err := GetDB().Table("retiros").Where("clientidentificationcard = ?", clientIDCard).Update("clientidentificationcard", newIdentification).Error
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println("deposits ALL : ", err)
 		return nil
 	}
 
-	response := u.Message(true, "client retiros has updated your identification")
+	response := u.Message(true, "client all retiros has updated its identification")
 	response["allretiros"] = temp
 	return response
 }
 
 // ---------------------------Validations------------------------------
 
-// ValidateRetiro struct that Front-End to Back-End
-func (retiro *Retiro) ValidateRetiro() (map[string]interface{}, bool) {
+func (retiro *Retiro) validateRetiro() (map[string]interface{}, bool) {
 
 	if retiro.Amount <= 0 {
 		return u.Message(false, "Amount is required"), false
 	}
 
-	temp := &Client{}
-	//check client in DB
-	err := GetDB().Table("clients").Where("identificationcard = ?", retiro.Clientidentificationcard).First(temp).Error
+	_, err := ExistClientIdentificationDB(retiro.Clientidentificationcard)
 	if err == gorm.ErrRecordNotFound {
-		fmt.Println("Retiros", err)
-		return u.Message(false, "Client exist no in DB"), false
+		return u.Message(false, "Client not exist"), false
 	}
 
 	return u.Message(false, "Requirement passed"), true

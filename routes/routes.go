@@ -88,9 +88,9 @@ func Routes() *mux.Router {
 	// -------------------Withdrawal----------------------------------
 
 	// Do a withdrawal to money in client account
-	router.HandleFunc("/api/admin/clients/{idClient}/withdrawal", handlers.Dowithdrawal).Methods("POST")
+	router.HandleFunc("/api/admin/clients/{clientidentificationcard}/withdrawal", handlers.Dowithdrawal).Methods("POST")
 	// To view all withdrawal Client
-	router.HandleFunc("/api/admin/clients/{idClient}/withdrawal", handlers.HistorialWithdrawal).Methods("GET")
+	router.HandleFunc("/api/admin/clients/{clientidentificationcard}/withdrawal", handlers.HistorialWithdrawal).Methods("GET")
 
 	// -------------------Coin----------------------------------------
 

@@ -52,8 +52,7 @@ func (client *Client) CreateClient() map[string]interface{} {
 // LoginClient function user
 func LoginClient(password string, seudonimo string) map[string]interface{} {
 
-	client := &Client{}
-	err := GetDB().Table("clients").Where("seudonimo = ? ", seudonimo).First(client).Error
+	client, err := ExistClientSeudonimonDB(seudonimo)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return u.Message(false, "seudonimo not found or not identificationcard")
@@ -273,15 +272,13 @@ func (client *Client) validateFields() (map[string]interface{}, bool) {
 
 func (client *Client) validateEqualUserData() (*Client, *Client, *Client, map[string]interface{}, bool) {
 	// tempIdentification form
-	tempForm := &Client{}
-	errAux := GetDB().Table("clients").Where("Identificationcard = ?", client.Identificationcard).First(tempForm).Error
+	tempForm, errAux := ExistClientIdentificationDB(client.Identificationcard)
 	if errAux != nil && errAux != gorm.ErrRecordNotFound {
 		return nil, nil, nil, u.Message(false, "Connection error. Please retry"), false
 	}
 
 	// tempSeudonimo form
-	tempSeudonimo := &Client{}
-	errSeudonimo := GetDB().Table("clients").Where("seudonimo = ?", client.Seudonimo).First(tempSeudonimo).Error
+	tempSeudonimo, errSeudonimo := ExistClientSeudonimonDB(client.Seudonimo)
 	if errSeudonimo != nil && errSeudonimo != gorm.ErrRecordNotFound {
 		return nil, nil, nil, u.Message(false, "Connection error. Please retry"), false
 	}

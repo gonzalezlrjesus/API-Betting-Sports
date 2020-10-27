@@ -37,10 +37,8 @@ func (admin *Admin) Validate() (map[string]interface{}, bool) {
 		return u.Message(false, "Password is required"), false
 	}
 
-	//Email must be unique
-	temp := &Admin{}
-
 	//check for errors and duplicate emails
+	temp := &Admin{}
 	err := GetDB().Table("admins").Where("email = ?", admin.Email).First(temp).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return u.Message(false, "Connection error. Please retry"), false

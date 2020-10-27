@@ -9,12 +9,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// GetTablas list Tablas
+// GetTablas list
 var GetTablas = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idRacing := vars["idRacing"]
 
-	data := models.GetTablas(&idRacing)
+	data := models.GetTablas(u.ConverStringToUint(idRacing))
 	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)

@@ -10,30 +10,28 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Dowithdrawal to client
+// Dowithdrawal from client coin
 var Dowithdrawal = func(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	clientIDCard := vars["clientidentificationcard"]
 
 	retiro := &models.Retiro{}
-	vars := mux.Vars(r)
-	idClient := vars["idClient"]
-
 	err := json.NewDecoder(r.Body).Decode(retiro)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Error while decoding request body"), 400)
 		return
 	}
-	retiro.Clientidentificationcard = idClient
-	resp := retiro.Dowithdrawal()
+
+	resp := retiro.Dowithdrawal(clientIDCard)
 	u.Respond(w, resp, 200)
 }
 
-// HistorialWithdrawal client
+// HistorialWithdrawal from client account
 var HistorialWithdrawal = func(w http.ResponseWriter, r *http.Request) {
-
 	vars := mux.Vars(r)
-	idClient := vars["idClient"]
+	clientIDCard := vars["clientidentificationcard"]
 
-	data := models.GetAllWithdrawal(&idClient)
+	data := models.GetAllWithdrawal(&clientIDCard)
 	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp, 200)
