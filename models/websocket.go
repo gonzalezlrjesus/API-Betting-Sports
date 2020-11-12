@@ -133,7 +133,6 @@ func (manager *ClientManager) Start() {
 func (manager *ClientManager) Send(message []byte, ignore *Clientmodel) {
 	for conn := range manager.clients {
 		if conn != ignore {
-			// fmt.Println("Send Send :", string(message))
 			conn.Send <- message
 		}
 	}
@@ -301,7 +300,6 @@ func (c *Clientmodel) Write() {
 				c.Socket.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
-			// fmt.Println("message write :", string(message))
 			c.Socket.WriteMessage(websocket.TextMessage, message)
 		}
 	}

@@ -222,18 +222,18 @@ func DeleteAllRacesByEventID(eventID uint) bool {
 // ExistRaceID .
 func ExistRaceID(raceID uint) (*Racing, error) {
 	temp := &Racing{}
-	err := GetDB().Table("racings").Where("id = ?", raceID).First(&Racing{}).Error
+	err := GetDB().Table("racings").Where("id = ?", raceID).First(temp).Error
 	return temp, err
 }
 
 func searchRacingByIDandEventID(idRacing, idEvent uint) (*Racing, error) {
 	temp := &Racing{}
-	err := GetDB().Table("racings").Where("id = ? AND eventid = ?", idRacing, idEvent).First(&Racing{}).Error
+	err := GetDB().Table("racings").Where("id = ? AND eventid = ?", idRacing, idEvent).First(temp).Error
 	return temp, err
 }
 
 func searchAllRacesByEventID(eventID uint) (*[]Racing, error) {
 	temp := &[]Racing{}
-	err := GetDB().Table("racings").Where("eventid = ?", eventID).Find(&[]Racing{}).Error
+	err := GetDB().Table("racings").Where("eventid = ?", eventID).Find(temp).Error
 	return temp, err
 }

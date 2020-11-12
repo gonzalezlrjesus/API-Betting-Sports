@@ -148,7 +148,7 @@ func (event *Event) ValidateEventParams(idEvent uint) (map[string]interface{}, b
 		return u.Message(false, "Connection error. Please retry"), false
 	}
 
-	if errAux != gorm.ErrRecordNotFound && tempForm.Dateevent != temp.Dateevent {
+	if errAux != gorm.ErrRecordNotFound && !(tempForm.Dateevent.Equal(temp.Dateevent)) {
 		return u.Message(false, "there is event with this DateEvent"), false
 	}
 
