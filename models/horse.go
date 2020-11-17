@@ -19,15 +19,9 @@ type Horse struct {
 }
 
 // CreateHorses add new race horses
-func CreateHorses(Arrayhorse []Horse, idRacing uint) map[string]interface{} {
-
-	_, err := ExistRaceID(idRacing)
-	if err == gorm.ErrRecordNotFound {
-		return u.Message(true, "Race not exist")
-	}
+func CreateHorses(Arrayhorse []Horse) map[string]interface{} {
 
 	for i := range Arrayhorse {
-		Arrayhorse[i].Racingid = idRacing
 		GetDB().Create(&Arrayhorse[i])
 	}
 

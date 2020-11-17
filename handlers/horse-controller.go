@@ -14,9 +14,6 @@ import (
 // CreateHorse add new Horses to db
 var CreateHorse = func(w http.ResponseWriter, r *http.Request) {
 
-	vars := mux.Vars(r)
-	idRacing := vars["idRacing"]
-
 	newsList := make([]models.Horse, 0)
 	err := json.NewDecoder(r.Body).Decode(&newsList)
 	if err != nil {
@@ -24,7 +21,7 @@ var CreateHorse = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := models.CreateHorses(newsList, u.ConverStringToUint(idRacing))
+	resp := models.CreateHorses(newsList)
 	u.Respond(w, resp, 201)
 }
 

@@ -75,7 +75,7 @@ func Routes() *mux.Router {
 	// -------------------Horse---------------------------------------
 
 	// Create new a Horse
-	router.HandleFunc("/api/admin/racing/{idRacing}/horse", handlers.CreateHorse).Methods("POST")
+	router.HandleFunc("/api/admin/racing/horse", handlers.CreateHorse).Methods("POST")
 	// To View all Horses
 	router.HandleFunc("/api/admin/racing/{idRacing}/horse", handlers.GetHorses).Methods("GET")
 	//********************// Update Horse state retirar caballos*************************
