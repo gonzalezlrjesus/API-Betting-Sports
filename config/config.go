@@ -20,7 +20,7 @@ func GetCORS() *cors.Cors {
 	return cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:4200", "*", "ws://localhost:4200"},
 		AllowCredentials: true,
-		AllowedMethods:   []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
+		AllowedMethods:   []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"},
 		AllowedHeaders:   []string{"Accept", "Content-Type", "Origin", "X-Requested-With", "Content-Length", "Accept-Encoding", "Cache-Control", "Authorization"},
 		// Enable Debugging for testing, consider disabling in production
 		Debug: false,
