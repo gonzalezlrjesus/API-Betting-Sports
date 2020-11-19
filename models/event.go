@@ -55,7 +55,6 @@ func (event *Event) UpdateEvent(idEvent uint) map[string]interface{} {
 		return nil
 	}
 
-	temp.Dateevent = event.Dateevent
 	temp.Hipodromo = event.Hipodromo
 	temp.Minimumamount = event.Minimumamount
 	temp.Profitpercentage = event.Profitpercentage
@@ -134,22 +133,9 @@ func (event *Event) ValidateEvent() (map[string]interface{}, bool) {
 // ValidateEventParams struct Params for Update Event
 func (event *Event) ValidateEventParams(idEvent uint) (map[string]interface{}, bool) {
 
-	if event.Dateevent.IsZero() {
-		return u.Message(false, "Date Event is empty"), false
-	}
-
-	temp, err := ExistEventID(idEvent)
+	_, err := ExistEventID(idEvent)
 	if err == gorm.ErrRecordNotFound {
 		return u.Message(false, "Not found ID Event Param"), false
-	}
-
-	tempForm, errAux := existEventDate(event.Dateevent)
-	if errAux != nil && errAux != gorm.ErrRecordNotFound {
-		return u.Message(false, "Connection error. Please retry"), false
-	}
-
-	if errAux != gorm.ErrRecordNotFound && !(tempForm.Dateevent.Equal(temp.Dateevent)) {
-		return u.Message(false, "there is event with this DateEvent"), false
 	}
 
 	return u.Message(false, "Requirement passed"), true
