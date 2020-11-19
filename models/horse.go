@@ -115,19 +115,22 @@ func WithdrawHorse(idHorse uint, idRacing uint) map[string]interface{} {
 		return u.Message(true, "Horse has not found")
 	}
 
+	SegAntesRemate := tempRacing.Auctiontime.Sub(time.Now()).Seconds()
+	SegDespuesCarrera := tempRacing.Starttime.Sub(time.Now()).Seconds()
+
+	if (SegAntesRemate < 0) && (SegDespuesCarrera > 0) {
+		fmt.Println("Estan Rematando: ", SegDespuesCarrera)
+		response := u.Message(true, "Horse has not been withdrawn")
+		response["horse"] = tempHorse
+		return response
+	}
+
 	tempHorse.State = "withdrawed"
 
 	GetDB().Save(&tempHorse)
 
-	SegAntesRemate := tempRacing.Auctiontime.Sub(time.Now()).Seconds()
-	SegDespuesCarrera := tempRacing.Starttime.Sub(time.Now()).Seconds()
-
 	if SegAntesRemate > 0 {
 		fmt.Println("No ha inicidado  Remate: ", SegAntesRemate)
-	}
-
-	if (SegAntesRemate < 0) && (SegDespuesCarrera > 0) {
-		fmt.Println("Estan Rematando: ", SegDespuesCarrera)
 	}
 
 	if (SegAntesRemate < 0) && (SegDespuesCarrera < 0) {
