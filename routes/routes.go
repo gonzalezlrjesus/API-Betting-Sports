@@ -100,7 +100,7 @@ func Routes() *mux.Router {
 	// -------------------Remates-------------------------------------
 
 	// To a specific remates Racings
-	router.HandleFunc("/api/admin/{idRacing}/remates", handlers.GetRematesFor).Methods("GET")
+	router.HandleFunc("/api/admin/racing/{idRacing}/remates", handlers.GetRematesFor).Methods("GET")
 
 	// -------------------Tablas--------------------------------------
 

@@ -108,6 +108,7 @@ func WithdrawHorse(idHorse uint, idRacing uint) map[string]interface{} {
 	// si es mayor retiro caballo, pregunto si apostaron por el el si es positivo
 	// devuelvo dinero a apostador y modifico monto total a pagar
 	// si no se aposto retiro caballo y modifico monto
+	// Validar que se cerro el remate
 	//
 
 	tempHorse, err := existSpecificHorse(idHorse, idRacing)
