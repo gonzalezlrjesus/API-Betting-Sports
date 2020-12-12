@@ -74,6 +74,6 @@ func SearchTablaByRaceID(idRace uint) (*Tablas, error) {
 
 func searchAllTablasByRaceID(idRace uint) ([]*Tablas, error) {
 	tablas := make([]*Tablas, 0)
-	err := GetDB().Table("tablas").Where("idracing = ?", idRace).Find(tablas).Error
+	err := GetDB().Table("tablas").Where("idracing = ?", idRace).Find(&tablas).Error
 	return tablas, err
 }
