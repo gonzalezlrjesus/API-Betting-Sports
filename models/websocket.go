@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -160,9 +161,15 @@ func (c *Clientmodel) Read() {
 		s, _ := strconv.Unquote(string(jsonMessage2))
 		var parsedData2 map[string]interface{}
 		errjson := json.Unmarshal([]byte(s), &parsedData2)
-		fmt.Println("errjson: *** ", errjson)
+		log.Println("errjson: *** ", parsedData2)
+		log.Println("errjson: *** ", errjson)
 
-		idCarrera = parsedData2["idcarrera"].(uint)
+		tempID := parsedData2["idcarrera"].(string)
+		u64, err := strconv.ParseUint(tempID, 10, 32)
+		if err != nil {
+			fmt.Println(err)
+		}
+		idCarrera := uint(u64)
 		finalizacion = parsedData2["finalizo"].(string)
 
 		matrixfloat64 := int64(parsedData2["matrix"].(float64))
