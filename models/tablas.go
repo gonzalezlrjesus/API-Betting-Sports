@@ -65,6 +65,27 @@ func (tabla *Tablas) UpdateStateTabla() map[string]interface{} {
 	return response
 }
 
+// UpdateMontos .
+func UpdateMontos(idRacing uint, amount int64) map[string]interface{} {
+	// TABLAS
+	tempTablas, err := SearchTablaByRaceID(idRacing)
+	if err == gorm.ErrRecordNotFound {
+		return u.Message(true, "Tabla not exist")
+	}
+	race, _ := ExistRaceID(idRacing)
+	event, _ := ExistEventID(race.Eventid)
+
+	newMontoTotal := tempTablas.Montototal - amount
+	var gananciaCasa int64 = (int64(event.Profitpercentage) * newMontoTotal) / 100
+	var gananciaGanador int64 = newMontoTotal - gananciaCasa
+	tempTablas.Montototal = newMontoTotal
+	tempTablas.Montoganador = gananciaGanador
+	tempTablas.Montocasa = gananciaCasa
+	GetDB().Save(&tempTablas)
+	response := u.Message(true, "Tabla has been updated")
+	return response
+}
+
 // SearchTablaByRaceID .
 func SearchTablaByRaceID(idRace uint) (*Tablas, error) {
 	temp := &Tablas{}
