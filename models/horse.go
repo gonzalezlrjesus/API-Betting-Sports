@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	u "github.com/gonzalezlrjesus/API-Betting-Sports/utils"
@@ -131,11 +132,27 @@ func WithdrawHorse(idHorse uint, idRacing uint) map[string]interface{} {
 	GetDB().Save(&tempHorse)
 
 	if SegAntesRemate > 0 {
-		fmt.Println("No ha inicidado  Remate: ", SegAntesRemate)
+		log.Println("No ha inicidado  Remate: ", SegAntesRemate)
 	}
 
 	if (SegAntesRemate < 0) && (SegDespuesCarrera < 0) {
-		fmt.Println("Termino Remate y Carrera: ", SegDespuesCarrera)
+		log.Println("Termino Remate y Carrera: ", SegDespuesCarrera)
+
+		// REMATES
+		tempREMATES, err := SearchRemateByRaceIDAndHorseID(idRacing, int(idHorse))
+		if err == gorm.ErrRecordNotFound {
+			return u.Message(true, "Remate not exist")
+		}
+
+		//check client-seudonimo in DB
+		tempClient, err := ExistClientSeudonimonDB(tempREMATES.Seudonimo)
+		if err == gorm.ErrRecordNotFound {
+			return u.Message(true, "Client not exist")
+		}
+
+		tempDeposit := &Deposit{Amount: float64(tempREMATES.Amount), Clientidentificationcard: tempClient.Identificationcard, FormaPago: "reintegro"}
+		tempDeposit.AddDepositClient()
+		UpdateMontos(idRacing, tempREMATES.Amount)
 	}
 
 	response := u.Message(true, "Horse has been withdrawed")
