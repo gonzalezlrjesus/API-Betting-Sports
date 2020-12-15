@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
@@ -31,7 +32,7 @@ type Message struct {
 	Sender         string `json:"sender,omitempty"`
 	Recipient      string `json:"recipient,omitempty"`
 	Content        string `json:"content,omitempty"`
-	Timerestante   int8
+	Timerestante   int64
 	Matrix         []MatrixRemates
 	Actualposition MatrixRemates
 }
@@ -54,7 +55,7 @@ var Manager = ClientManager{
 	clients:    make(map[*Clientmodel]bool),
 }
 
-var myInt8 int8 = 16
+var myInt8 int64 = 16
 var arrayRemates []MatrixRemates
 var actualPosition MatrixRemates
 var idCarrera uint
@@ -97,13 +98,14 @@ func (manager *ClientManager) Start() {
 				if TimeisEqualStartTime(idCarrera) {
 					// fmt.Println("APROBADO CERRADO", reflect.TypeOf(idCarrera))
 					arrayRemates = nil
-					myInt8 = 11
+					myInt8, _ = strconv.ParseInt(os.Getenv("TimebetweenAuctions"), 10, 64)
+					myInt8 = myInt8 + 1
 					idCarrera = uint(0)
 				}
 			}
 
 			if len(manager.clients) == 0 {
-				myInt8 = 10
+				myInt8, _ = strconv.ParseInt(os.Getenv("TimebetweenAuctions"), 10, 64)
 				// arrayRemates = nil
 			}
 
@@ -111,7 +113,7 @@ func (manager *ClientManager) Start() {
 				myInt8 = myInt8 - 1
 
 				if myInt8 < 0 {
-					myInt8 = 10
+					myInt8, _ = strconv.ParseInt(os.Getenv("TimebetweenAuctions"), 10, 64)
 
 				}
 
@@ -290,7 +292,7 @@ func (c *Clientmodel) Read() {
 		}
 
 		// fmt.Println("arrayRemates ", arrayRemates)
-		myInt8 = 10
+		myInt8, _ = strconv.ParseInt(os.Getenv("TimebetweenAuctions"), 10, 64)
 		Manager.broadcast <- jsonMessage
 	}
 }
