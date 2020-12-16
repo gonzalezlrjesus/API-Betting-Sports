@@ -86,6 +86,10 @@ func TimeisEqualStartTime(idRacing uint) bool {
 		return false
 	}
 
+	if temp.Stateracing == "CLOSED" {
+		return false
+	}
+
 	// Hours
 	hs := temp.Starttime.Sub(time.Now()).Hours()
 	// Minutes
@@ -99,7 +103,7 @@ func TimeisEqualStartTime(idRacing uint) bool {
 	// fmt.Println(ms == 0, "minutes == 0")
 	// fmt.Println(int(ss) == 0, "ss == 0")
 
-	if ms == 0 && int(ss) == 0 {
+	if hs == 0 && ms == 0 && ss == 0 {
 		CloseRacing(idRacing)
 		return true
 	}
