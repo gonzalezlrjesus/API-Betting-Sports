@@ -54,14 +54,14 @@ func AddGananciaClient(seudonimo string, montoganado int64, formapago string, se
 	tempCoins := &Coins{Clientidentificationcard: depositGanador.Clientidentificationcard}
 
 	//check client in Coins table DB
-	_, errCoins := ExistClientinCoinsDB(tempCoins.Clientidentificationcard)
+	tempClient, errCoins := ExistClientinCoinsDB(tempCoins.Clientidentificationcard)
 	if errCoins == gorm.ErrRecordNotFound {
 		return nil
 	}
 
 	GetDB().Create(depositGanador)
 	response := u.Message(true, "deposit has been created")
-	response["updateCoins"] = tempCoins.UpdateCoins(depositGanador.Amount)
+	response["updateCoins"] = tempClient.UpdateCoins(depositGanador.Amount)
 	response["depositGanador"] = depositGanador
 	return response
 }
