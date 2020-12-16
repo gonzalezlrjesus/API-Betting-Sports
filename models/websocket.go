@@ -45,6 +45,7 @@ type MatrixRemates struct {
 	Seudonimo     string
 	idCaballo     int
 	Horsename     string
+	idRacing      uint
 }
 
 // Manager export to controller
@@ -93,14 +94,16 @@ func (manager *ClientManager) Start() {
 			}
 		case <-time.After(1 * time.Second):
 
-			if idCarrera != 0 {
-				// fmt.Println("IF ENTRO", reflect.TypeOf(idCarrera))
-				if TimeisEqualStartTime(idCarrera) {
-					// fmt.Println("APROBADO CERRADO", reflect.TypeOf(idCarrera))
+			if actualPosition.idRacing != 0 {
+				// fmt.Println("IF ENTRO", actualPosition.idRacing)
+				if TimeisEqualStartTime(actualPosition.idRacing) {
+					// fmt.Println("APROBADO CERRADO", actualPosition.idRacing)
 					arrayRemates = nil
+					actualPosition = MatrixRemates{}
 					myInt8, _ = strconv.ParseInt(os.Getenv("TimebetweenAuctions"), 10, 64)
 					myInt8 = myInt8 + 1
 					idCarrera = uint(0)
+					montoTotal = 0
 				}
 			}
 
@@ -188,6 +191,7 @@ func (c *Clientmodel) Read() {
 		a.Seudonimo = seudonimoActual
 		a.idCaballo = idhorse
 		a.Horsename = HorsenameActual
+		a.idRacing = idCarrera
 
 		var respaldoActual MatrixRemates //
 		respaldoActual.Monto = actualPosition.Monto
@@ -196,6 +200,7 @@ func (c *Clientmodel) Read() {
 		respaldoActual.Seudonimo = actualPosition.Seudonimo
 		respaldoActual.Horsename = actualPosition.Horsename
 		respaldoActual.idCaballo = actualPosition.idCaballo
+		respaldoActual.idRacing = actualPosition.idRacing
 
 		actualPosition.Monto = a.Monto
 		actualPosition.MatrixRow = int(parsedData2["matrixRowSiguiente"].(float64))
@@ -203,6 +208,7 @@ func (c *Clientmodel) Read() {
 		actualPosition.Seudonimo = a.Seudonimo
 		actualPosition.Horsename = a.Horsename
 		actualPosition.idCaballo = a.idCaballo
+		actualPosition.idRacing = a.idRacing
 
 		// fmt.Println("actualPosition BEFORE ---", actualPosition)
 		// fmt.Println("          a MatrixRemates BEFORE ---", a)
