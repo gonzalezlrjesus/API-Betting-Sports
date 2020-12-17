@@ -38,7 +38,7 @@ func GetAllWithdrawal(clientIDCard *string) map[string]interface{} {
 
 	//check deposits ALL in DB
 	temp := &[]Retiro{}
-	err := GetDB().Table("retiros").Where("clientidentificationcard = ?", *clientIDCard).Find(temp).Error
+	err := GetDB().Table("retiros").Where("clientidentificationcard = ?", *clientIDCard).Order("id").Find(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil
 	}

@@ -116,7 +116,7 @@ func GetUser(id uint) *Admin {
 func GetAdmins() []*Admin {
 
 	admins := make([]*Admin, 0)
-	err := GetDB().Table("admins").Find(&admins).Error
+	err := GetDB().Table("admins").Order("id").Find(&admins).Error
 	if err != nil {
 		log.Println(err)
 		return nil

@@ -56,7 +56,7 @@ func (horse *Horse) UpdateHorse(idRacing uint, idHorse string) map[string]interf
 func GetHorses(idRacing string) map[string]interface{} {
 
 	horses := &[]Horse{}
-	err := GetDB().Table("horses").Where("Racingid = ?", idRacing).Find(horses).Error
+	err := GetDB().Table("horses").Where("Racingid = ?", idRacing).Order("id").Find(horses).Error
 	if err != nil {
 		return nil
 	}

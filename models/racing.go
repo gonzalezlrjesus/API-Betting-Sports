@@ -238,6 +238,6 @@ func searchRacingByIDandEventID(idRacing, idEvent uint) (*Racing, error) {
 
 func searchAllRacesByEventID(eventID uint) (*[]Racing, error) {
 	temp := &[]Racing{}
-	err := GetDB().Table("racings").Where("eventid = ?", eventID).Find(temp).Error
+	err := GetDB().Table("racings").Where("eventid = ?", eventID).Order("id").Find(temp).Error
 	return temp, err
 }

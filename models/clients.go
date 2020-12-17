@@ -77,7 +77,7 @@ func LoginClient(password string, seudonimo string) map[string]interface{} {
 func GetClient(idClient *string) []*Client {
 
 	client := make([]*Client, 0)
-	GetDB().Table("clients").Order("seudonimo").Where("id = ?", *idClient).Find(&client)
+	GetDB().Table("clients").Order("seudonimo").Where("id = ?", *idClient).Order("id").Find(&client)
 
 	for _, s := range client {
 		s.Password = ""
@@ -89,7 +89,7 @@ func GetClient(idClient *string) []*Client {
 func GetClients() []*Client {
 
 	clients := make([]*Client, 0)
-	GetDB().Table("clients").Order("seudonimo").Find(&clients)
+	GetDB().Table("clients").Order("seudonimo").Order("id").Find(&clients)
 
 	for _, s := range clients {
 		s.Password = ""

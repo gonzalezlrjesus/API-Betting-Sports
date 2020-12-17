@@ -56,12 +56,12 @@ func GetRemates(idracing uint) map[string]interface{} {
 // SearchRemateByRaceIDAndHorseID .
 func SearchRemateByRaceIDAndHorseID(idRacing uint, idHorse int) (*Remates, error) {
 	temp := &Remates{}
-	err := GetDB().Table("remates").Where("idracing = ? AND idhorse = ?", idRacing, idHorse).Find(temp).Error
+	err := GetDB().Table("remates").Where("idracing = ? AND idhorse = ?", idRacing, idHorse).Order("id").Find(temp).Error
 	return temp, err
 }
 
 func searchRematesByRacingID(idracing uint) ([]*Remates, error) {
 	remates := make([]*Remates, 0)
-	err := GetDB().Table("remates").Where("idracing = ?", idracing).Find(&remates).Error
+	err := GetDB().Table("remates").Where("idracing = ?", idracing).Order("id").Find(&remates).Error
 	return remates, err
 }

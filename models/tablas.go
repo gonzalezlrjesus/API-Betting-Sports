@@ -89,12 +89,12 @@ func UpdateMontos(idRacing uint, amount int64) map[string]interface{} {
 // SearchTablaByRaceID .
 func SearchTablaByRaceID(idRace uint) (*Tablas, error) {
 	temp := &Tablas{}
-	err := GetDB().Table("tablas").Where("idracing = ?", idRace).Find(temp).Error
+	err := GetDB().Table("tablas").Where("idracing = ?", idRace).Order("id").Find(temp).Error
 	return temp, err
 }
 
 func searchAllTablasByRaceID(idRace uint) ([]*Tablas, error) {
 	tablas := make([]*Tablas, 0)
-	err := GetDB().Table("tablas").Where("idracing = ?", idRace).Find(&tablas).Error
+	err := GetDB().Table("tablas").Where("idracing = ?", idRace).Order("id").Find(&tablas).Error
 	return tablas, err
 }
