@@ -83,7 +83,7 @@ func GetOneEvent(idEvent uint) map[string]interface{} {
 func GetEvents() map[string]interface{} {
 
 	events := make([]*Event, 0)
-	err := GetDB().Table("events").Order("dateevent").Order("id").Find(&events).Error
+	err := GetDB().Table("events").Order("id").Find(&events).Error
 	if err != nil {
 		return nil
 	}
