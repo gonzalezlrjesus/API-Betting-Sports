@@ -71,7 +71,7 @@ func GetAllDepositsClient(idClient *string) map[string]interface{} {
 
 	//check deposits ALL in DB
 	temp := &[]Deposit{}
-	err := GetDB().Table("deposits").Where("ClientIdentificationcard = ?", *idClient).Order("id").Find(temp).Error
+	err := GetDB().Table("deposits").Where("ClientIdentificationcard = ?", *idClient).Order("id desc").Find(temp).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil
 	}
